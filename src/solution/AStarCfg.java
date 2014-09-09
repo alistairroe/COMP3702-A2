@@ -131,7 +131,12 @@ public class AStarCfg {
 			ASVConfig startCfg, ArrayList<ASVConfig> pathList) {
 		pathList.add(currentCfg);
 		if (currentCfg.equals(startCfg)) { // Base Case
-			return pathList;
+			//Array is in reverse order so reverse
+			ArrayList<ASVConfig> sortedPath = new ArrayList<ASVConfig>();
+			for (int i=pathList.size()-1; i>0; i--){
+				sortedPath.add(pathList.get(i));
+			}
+			return sortedPath;
 		} else {
 			return reconstructPath(parentMap, parentMap.get(currentCfg),
 					startCfg, pathList);
