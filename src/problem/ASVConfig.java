@@ -1,10 +1,12 @@
 package problem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 
 /**
  * Represents a configuration of the ASVs. This class doesn't do any validity
@@ -80,6 +82,16 @@ public class ASVConfig {
 						asvPositions.get(i-2).getY() + BOOM_LENGTH * Math.sin(coords[i])));
 			}
 		}
+		
+		int centreASV = asvPositions.size() / 2;
+		double dx = asvPositions.get(0).getX() - asvPositions.get(centreASV).getX();
+		double dy = asvPositions.get(0).getY() - asvPositions.get(centreASV).getY();
+		for(Point2D.Double point : asvPositions) {
+			point.setLocation(point.getX() + dx, point.getY() + dy);
+		}
+		
+		
+		
 	}
 	
 

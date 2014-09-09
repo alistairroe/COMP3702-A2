@@ -35,7 +35,7 @@ public class Alistair {
 		ps = new ProblemSpec();
 		
 		try{
-			ps.loadProblem("src/testcases/7ASV-easy.txt");
+			ps.loadProblem("src/testcases/3ASV.txt");
 		} catch (IOException e) {
 			
 		}

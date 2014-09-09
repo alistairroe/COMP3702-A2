@@ -81,6 +81,8 @@ public class ConfigGen {
 			//Set coordinates as a configuration
 			cfg = new ASVConfig(false, coordsCFG);
 
+			
+			
 			// Test Configuration Validity
 			if (tester.hasValidBoomLengths(cfg) && tester.hasEnoughArea(cfg)
 					&& tester.fitsBounds(cfg) && tester.isConvex(cfg)
@@ -145,6 +147,8 @@ public class ConfigGen {
 		System.out.println("Configurations Linked: "+configs.size());
 		System.out.println("Redundancies: "+(nInitCfgs-configs.size()));
 	}
+	
+	
 	
 	
 	

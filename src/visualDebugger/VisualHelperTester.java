@@ -93,7 +93,7 @@ public class VisualHelperTester {
 			visualHelper.addLinkedPoints(l);			
 			
 			int i=1;
-			int nASV = 7;
+			int nASV = a.ps.getASVCount();
 			int nSample=150;
 			double maxDist = 0.1;
 			maxDist = 0.05;
@@ -160,7 +160,7 @@ public class VisualHelperTester {
 			visualHelper.repaint();
 			a.ps.setPath(validConfigs);
 			try {
-				a.ps.saveSolution("test_out.txt");
+				a.ps.saveSolution("src/testcases/test_out.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
