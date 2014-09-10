@@ -2,6 +2,7 @@ package solution;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,6 +17,7 @@ import java.util.Random;
 
 //import java.util.Map.Entry;
 
+
 import problem.ProblemSpec;
 import problem.Obstacle;
 
@@ -29,7 +31,7 @@ public class Alistair {
 		ps = new ProblemSpec();
 		
 		try{
-			ps.loadProblem("src/testcases/7-ASV-x4.txt");
+			ps.loadProblem("src/testcases/7-ASV-x2.txt");
 		} catch (IOException e) {
 			
 		}
@@ -58,6 +60,34 @@ public class Alistair {
 					valid = false;
 				}
 			}
+			for(Obstacle o: ps.getObstacles()) {
+				double delta = 0.028;
+				Rectangle2D rect = o.getRect();
+				//Rectangle2D.Double grownRect = new Rectangle2D.Double(rect.getX() - delta, rect.getY() - delta,rect.getWidth() + delta * 2, rect.getHeight() + delta * 2);
+
+//				if(grownRect.getMaxY()  > newNode.getY()) {
+//					if(newNode.getY() > rect.getMaxY()) {
+//						newNode.y = rect.getMaxY() + 0.012;
+//					}
+//				}
+//				if(grownRect.getMinY()  < newNode.getY()) {
+//					if(newNode.getY() < rect.getMinY()) {
+//						newNode.y = rect.getMinY() - 0.012;
+//					}
+//				}
+//				if(rect.getMaxY() + delta  > newNode.getY()) {
+//					if(newNode.getY() > rect.getMaxY()) {
+//						newNode.y = rect.getMaxY() + delta;
+//					}
+//				}
+//				if(rect.getMinY() - delta  < newNode.getY()) {
+//					if(newNode.getY() < rect.getMinY()) {
+//						newNode.y = rect.getMinY() - delta;
+//					}
+//				}
+				
+			}
+			
 			if(valid) {
 				map.put(newNode,new HashMap<Node,Double>());
 				for(Node n : map.keySet()) {
@@ -188,5 +218,20 @@ public class Alistair {
 			
 		}
 		return corners;
+	}
+	
+	public List<Node> interpolateNodes(Node n0, Node n1) {
+
+		double angle1 = Math.atan2(n1.getY() - n0.getY(),
+				n1.getX() - n0.getX());
+		
+		List<Node> list1 = new ArrayList<Node>();
+		list1.add(n0);
+		while(list1.get(list1.size()-1).getDistanceTo(n1)>0.01) {
+			double newx = list1.get(list1.size()-1).getX() + 0.01 * Math.cos(angle1);
+			double newy = list1.get(list1.size()-1).getY() + 0.01 * Math.sin(angle1);
+			list1.add(new Node(newx, newy));
+		}
+		return list1;
 	}
 }

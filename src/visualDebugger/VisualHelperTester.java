@@ -61,9 +61,13 @@ public class VisualHelperTester {
 		VisualHelper visualHelper = new VisualHelper();		
 		
 		System.out.println(path);
-
-		
-		
+		List<Node> interpolatedPath = new ArrayList<Node>();
+		for(int i = 1; i < path.size();i++) {
+			interpolatedPath.addAll(a.interpolateNodes(path.get(i-1),path.get(i)));
+			
+		}
+		interpolatedPath.add(path.get(path.size()-1));
+		//System.out.println(interpolatedPath);
 		ArrayList<Rectangle2D> rects = new ArrayList<Rectangle2D>();
 		for(Obstacle o: a.ps.getObstacles()) {
 			rects.add(o.getRect());
@@ -91,10 +95,10 @@ public class VisualHelperTester {
 			
 			int i=1;
 			int nASV = a.ps.getASVCount();
-			int nSample=50;
+			int nSample=10;
 			double maxLinkDist = 0.05;
 			
-			ConfigGen cfGen = new ConfigGen(nSample,a.findPathCorners(path));
+			ConfigGen cfGen = new ConfigGen(nSample,a.findPathCorners(path),a.ps);
 			
 			List<Point2D.Double> pos = a.ps.getInitialState().getASVPositions();
 			int deltaPos;
@@ -115,25 +119,23 @@ public class VisualHelperTester {
 			
 			//ConfigGenOld cfGen = new ConfigGenOld(nSample);
 			cfGen.setPS(a.ps);
-			for(Node n : path) {
-				l.remove(0);
+
+			for(Node n : interpolatedPath) {
+				Point2D.Double prevN = l.remove(0);
 				l.add(n.toPoint2D());
 				visualHelper.addLinkedPoints(l);
 				
 				
-				cfGen.generateConfigs(n, nASV, deltaPos);
+				cfGen.generateConfigs(n, nASV, deltaPos, prevN);
 				
-				int j = 1;
-				for (ASVConfig cfg: cfGen.getConfigs()){
-					//System.out.println("Displaying CFG: "+j+"/"+nSample);
-					visualHelper.addPoints(cfg.getASVPositions());
-					visualHelper.addLinkedPoints(cfg.getASVPositions());
-					//visualHelper.repaint();
-					j++;
-					if (j>nSample) j = 1;
-					//visualHelper.addPoints(cfg.getASVPositions().g);
-				}
-				System.out.println("Sampling Around Node: "+i+"/"+path.size());
+//				for (ASVConfig cfg: cfGen.getConfigs()){
+//					//System.out.println("Displaying CFG: "+j+"/"+nSample);
+//					visualHelper.addPoints(cfg.getASVPositions());
+//					visualHelper.addLinkedPoints(cfg.getASVPositions());
+//					//visualHelper.repaint();
+//					//visualHelper.addPoints(cfg.getASVPositions().g);
+//				}
+				System.out.println("Sampling Around Node: "+i+"/"+interpolatedPath.size());
 				i++;
 				
 //				try{
@@ -155,6 +157,8 @@ public class VisualHelperTester {
 				visualHelper.addPoints(cfg.getASVPositions());
 				visualHelper.addLinkedPoints(cfg.getASVPositions());
 			}
+			
+			visualHelper.waitKey();
 			//visualHelper.addRectangles(rects);
 			System.out.println("Removing redundancies...");
 			

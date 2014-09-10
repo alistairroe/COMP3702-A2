@@ -33,6 +33,11 @@ public class ASVConfig {
 					coords[i * 2 + 1]));
 		}
 	}
+	
+	public ASVConfig(List<Point2D.Double> list) {
+		asvPositions = list;
+	}
+	
 
 	/**
 	 * Constructs an ASVConfig from a space-separated string of x- and y-
