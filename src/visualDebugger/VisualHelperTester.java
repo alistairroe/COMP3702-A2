@@ -43,18 +43,18 @@ public class VisualHelperTester {
 //		
 		
 		//VisualHelper visualHelper = new VisualHelper();
-		
-		Node n1 = new Node(0.1,0.1);
-		Node n2 = new Node(0.9,0.1);
 		Alistair a = new Alistair();
+		Node n1 = new Node(a.ps.getInitialState().getASVPositions().get(a.ps.getASVCount()/2));
+		Node n2 = new Node(a.ps.getGoalState().getASVPositions().get(a.ps.getASVCount()/2));
 		
-		ArrayList<Node> path = new ArrayList<Node>();
 		
+		List<Node> path = new ArrayList<Node>();
+		List<List<Point2D.Double>> edges = new ArrayList<List<Point2D.Double>>();
 		int trial = 0;
 		while(path.isEmpty()){
 			System.out.print("Trial "+trial+" -> ");			
-			List<List<Point2D.Double>> edges = a.createPRM(n1,n2,10000,0.02);
-			path = a.AStar(n1, n2);
+			edges = a.createPRM(n1,n2,10000,0.02);
+			path = a.AStar(n1,n2);
 			trial++;
 			//ArrayList<Point2D.Double> corners = a.findPathCorners(path);
 		}
@@ -73,18 +73,15 @@ public class VisualHelperTester {
 		visualHelper.addRectangles(rects);
 		
 		
-		/*
-		 * for(List<Point2D.Double> e : edges){
-	
-		
-			if(e.size()== 2) {
-				visualHelper.addLinkedPoints(e);
-			} else {
-				visualHelper.addPoints(e);
-			}
+		List<Point2D.Double> list1 = new ArrayList<Point2D.Double>();
+		 for(Node e : path){
+			list1.add(e.toPoint2D());
+			
 			//visualHelper.addPoints(corners);
 		}
-		*/
+		 visualHelper.addLinkedPoints2(list1);
+		 visualHelper.addPoints(list1);
+		
 		
 		List<Point2D.Double> l = new ArrayList<Point2D.Double>();
 		if(path.size()!= 0) {
@@ -94,10 +91,28 @@ public class VisualHelperTester {
 			
 			int i=1;
 			int nASV = a.ps.getASVCount();
-			int nSample=150;
-			double maxDist = 0.1;
-			maxDist = 0.05;
-			ConfigGen cfGen = new ConfigGen(nSample);
+			int nSample=50;
+			double maxLinkDist = 0.05;
+			
+			ConfigGen cfGen = new ConfigGen(nSample,a.findPathCorners(path));
+			
+			List<Point2D.Double> pos = a.ps.getInitialState().getASVPositions();
+			int deltaPos;
+			double angle1 = Math.atan2(pos.get(1).getY() - pos.get(0).getY(), pos.get(1).getX() - pos.get(0).getX());
+			double angle2 = Math.atan2(pos.get(2).getY() - pos.get(1).getY(), pos.get(2).getX() - pos.get(1).getX());
+			double deltaAngle = angle2 - angle1;
+			if(deltaAngle > Math.PI) {
+				deltaAngle = deltaAngle - 2 * Math.PI;
+			}
+			if(deltaAngle < -Math.PI) {
+				deltaAngle = deltaAngle + 2* Math.PI;
+			}
+			if(deltaAngle > 0) {
+				deltaPos = 1;
+			} else {
+				deltaPos = -1;
+			}
+			
 			//ConfigGenOld cfGen = new ConfigGenOld(nSample);
 			cfGen.setPS(a.ps);
 			for(Node n : path) {
@@ -105,7 +120,8 @@ public class VisualHelperTester {
 				l.add(n.toPoint2D());
 				visualHelper.addLinkedPoints(l);
 				
-				cfGen.generateConfigs(n, nASV);
+				
+				cfGen.generateConfigs(n, nASV, deltaPos);
 				
 				int j = 1;
 				for (ASVConfig cfg: cfGen.getConfigs()){
@@ -128,11 +144,11 @@ public class VisualHelperTester {
 			}
 			visualHelper.repaint();
 			System.out.println("Linking Configurations...");
-			cfGen.linkConfigs(maxDist); //TO DO: if failed, try again!
+			cfGen.linkConfigs(maxLinkDist); //TO DO: if failed, try again!
 			// Wait for user key press
-			visualHelper.waitKey();
+			//visualHelper.waitKey();
 			
-			visualHelper.clearAll();
+			//visualHelper.clearAll();
 			
 			visualHelper.addRectangles(rects);
 			for (ASVConfig cfg: cfGen.getConfigs()){

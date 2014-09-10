@@ -25,6 +25,16 @@ public class Alistair {
 	public ProblemSpec ps;
 	HashMap<Node,HashMap<Node,Double>> map;
 	
+	public Alistair() {
+		ps = new ProblemSpec();
+		
+		try{
+			ps.loadProblem("src/testcases/7-ASV-x4.txt");
+		} catch (IOException e) {
+			
+		}
+	}
+	
 	public List<List<Point2D.Double>> createPRM(Node start, Node end, int N, double maxEdgeDistance) {
 		//double maxEdgeDistance = 0.025;
 		
@@ -32,13 +42,7 @@ public class Alistair {
 		
 		
 		Random generator = new Random();
-		ps = new ProblemSpec();
 		
-		try{
-			ps.loadProblem("src/testcases/3ASV.txt");
-		} catch (IOException e) {
-			
-		}
 		
 		map.put(start, new HashMap<Node,Double>());
 		map.put(end, new HashMap<Node,Double>());
@@ -163,7 +167,7 @@ public class Alistair {
 		return path;
 	}
 	
-	public ArrayList<Point2D.Double> findPathCorners(ArrayList<Node> path) {
+	public List<Point2D.Double> findPathCorners(List<Node> path) {
 		ArrayList<Point2D.Double> corners = new ArrayList<Point2D.Double>();
 		
 		for(Obstacle o: ps.getObstacles()) {

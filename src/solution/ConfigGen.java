@@ -19,12 +19,14 @@ public class ConfigGen {
 	private ProblemSpec ps = new ProblemSpec();
 	private static Random rndGen = new Random(); // Random number generator
 	private static Tester tester = new Tester();
+	private List<Point2D.Double> corners;
 
 	private HashMap<ASVConfig , HashMap<ASVConfig , Double>> configMap = new HashMap<
 			ASVConfig, HashMap<ASVConfig,Double>>();
 	
-	public ConfigGen(int nSample) {
+	public ConfigGen(int nSample, List<Point2D.Double> corners) {
 		this.numSamples = nSample;
+		this.corners = corners;
 		setPS(ps);
 	}
 
@@ -55,13 +57,27 @@ public class ConfigGen {
 	 * @param n - the Node near which to generate the configurations
 	 * @param numASV - the number of ASVs in a configuration
 	 */
-	public void generateConfigs(Node n, int numASV) {
-		double maxDist = 0.05; //Max distance the first ASV will be from n 
+	public void generateConfigs(Node n, int numASV, int convexity) {
+		double maxDist = 0.01; //Max distance the first ASV will be from n 
 		int i = 0;
 		int j = 0;
 		double randVal; //Randomly generated value
 		double[] coordsCFG; //Configuration-space coordinates of ASVs (x,y,theta1,theta2,...)
 		ASVConfig cfg;
+		
+		double minDistance = 0.5;
+		for(Point2D.Double p : corners) {
+			double distance = n.getDistanceTo(new Node(p));
+			if(distance < minDistance) {
+				minDistance = distance;
+			}//*(6 - 10*minDistance)
+		}
+		int asvNo = 0;
+		List<Integer> counter = new ArrayList<Integer>();
+		for(int m = 0; m < ps.getASVCount(); m++) {
+			counter.add(0);
+		}
+		int incrementer = 0;
 		while (i < numSamples) {
 			coordsCFG = new double[numASV + 1];
 			j = 0;
@@ -71,18 +87,24 @@ public class ConfigGen {
 					//coordsCFG[1] = n.getX();
 					coordsCFG[0] = n.getX() + ((rndGen.nextFloat() - 0.5)*2.0) * maxDist;
 					coordsCFG[1] = n.getY() + ((rndGen.nextFloat() - 0.5)*2.0) * maxDist;
-					j++; //Increment immediately
+					coordsCFG[2] = rndGen.nextFloat() * 2 * Math.PI;
+					j = j + 2;
+					//Increment immediately
 				}
 				// Here j >= 1
+				
 				randVal = rndGen.nextFloat();
-				coordsCFG[j + 1] = randVal * 2 * Math.PI;
+				coordsCFG[j + 1] = tester.normaliseAngle(coordsCFG[j] + convexity * randVal * 2 * Math.PI / 3);
 				j++;
 			}
 			//Set coordinates as a configuration
-			cfg = new ASVConfig(false, coordsCFG);
+			
+			cfg = new ASVConfig(false, coordsCFG, asvNo);
 
-			
-			
+			counter.set(asvNo,counter.get(asvNo) + 1);
+			if(counter.get(asvNo) > 500000) {
+				asvNo++;
+			}
 			// Test Configuration Validity
 			if (tester.hasValidBoomLengths(cfg) && tester.hasEnoughArea(cfg)
 					&& tester.fitsBounds(cfg) && tester.isConvex(cfg)
@@ -91,8 +113,14 @@ public class ConfigGen {
 				// System.out.println("ADDED CONFIG: " + (i + 1) + "/"
 				// + numSamples);
 				i++;
+				if(asvNo == ps.getASVCount() - 1) {
+			 		asvNo = 0;
+				} else {
+					asvNo++;
+				}
 			}
 		}
+		System.out.println(counter);
 	}
 	
 	public void setNumSamples(int numSamples){
@@ -122,8 +150,10 @@ public class ConfigGen {
 					j++;
 				}
 			}
-			//System.out.println("Cfg "+i+" maps to "+j);
+			
+			System.out.println("Cfg "+i+" " + nInitCfgs);
 			j=0;
+			i++;
 		}
 		/*for (ASVConfig cfg: configMap.keySet()){
 			if (!cfg.equals(ps.getInitialState()) && !cfg.equals(ps.getGoalState())){
@@ -187,14 +217,16 @@ public class ConfigGen {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-
-		ConfigGen a = new ConfigGen(5);
-
-		// generateConfig(2);
-
-		System.out.print(a.getConfigs().toString());
-
-	}
+//	public static void main(String[] args) {
+//
+//		ConfigGen a = new ConfigGen(5);
+//
+//		// generateConfig(2);
+//
+//		System.out.print(a.getConfigs().toString());
+//
+//	}
+	
+	
 
 }

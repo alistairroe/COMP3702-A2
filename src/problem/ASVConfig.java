@@ -94,6 +94,32 @@ public class ASVConfig {
 		
 	}
 	
+	public ASVConfig(boolean xyMode, double[] coords, int asvNo) {
+		if (xyMode){ //XY-based
+			for (int i = 0; i < coords.length / 2; i++) {
+				asvPositions.add(new Point2D.Double(coords[i * 2],
+						coords[i * 2 + 1]));
+			}
+		} else {    //Angle-based
+			asvPositions.add(new Point2D.Double(coords[0],coords[1])); //Add initial point
+			for (int i = 2; i < coords.length; i++) { //Add angled points
+				asvPositions.add(new Point2D.Double(asvPositions.get(i-2).getX() 
+						+ BOOM_LENGTH * Math.cos(coords[i]),
+						asvPositions.get(i-2).getY() + BOOM_LENGTH * Math.sin(coords[i])));
+			}
+		}
+		
+		//int centreASV = asvPositions.size() / 2;
+		double dx = asvPositions.get(0).getX() - asvPositions.get(asvNo).getX();
+		double dy = asvPositions.get(0).getY() - asvPositions.get(asvNo).getY();
+		for(Point2D.Double point : asvPositions) {
+			point.setLocation(point.getX() + dx, point.getY() + dy);
+		}
+		
+		
+		
+	}
+	
 
 	/**
 	 * Copy constructor.

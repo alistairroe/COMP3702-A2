@@ -20,6 +20,13 @@ public class Node extends Point2D{
 		FScore = 0;
 		
 	}
+	
+	public Node(Point2D.Double point) {
+		this.x = point.getX();
+		this.y = point.getY();
+		GScore = 0;
+		FScore = 0;
+	}
 
 	@Override
 	public double getX() {

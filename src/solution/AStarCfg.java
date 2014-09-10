@@ -58,8 +58,8 @@ public class AStarCfg {
 
 		double tentativeGCost;
 		while (!openSet.isEmpty()) {
-			System.out.println("Closed: " + closedSet.size() + "\tOpen: "
-					+ openSet.size());
+			//System.out.println("Closed: " + closedSet.size() + "\tOpen: "
+					//+ openSet.size());
 
 			currCfg = openSet.remove();
 
@@ -71,8 +71,8 @@ public class AStarCfg {
 			closedSet.add(currCfg);
 			// System.out.println(configMap.keySet());
 			if (configMap.keySet().contains(currCfg)) {
-				System.out.println(" -> Links: "
-						+ configMap.get(currCfg).size());
+				//System.out.println(" -> Links: "
+						//+ configMap.get(currCfg).size());
 				
 				int nRedundant = 0;				
 				for (ASVConfig childCfg : configMap.get(currCfg).keySet()) {
@@ -100,7 +100,7 @@ public class AStarCfg {
 						}
 					}
 				}
-				System.out.println(" -> Redundancies: "	+ nRedundant);
+				//System.out.println(" -> Redundancies: "	+ nRedundant);
 			}
 			//return 	reconstructPath(parentMap, currCfg, startCfg,
 			//		new ArrayList<ASVConfig>()); // TESTING!

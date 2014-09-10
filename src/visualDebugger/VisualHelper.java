@@ -29,6 +29,8 @@ public class VisualHelper extends JPanel implements KeyListener {
 	private List<Line2D> lines = new ArrayList<Line2D>();
 	private List<ArrayList<Point2D>> linkedPoints =
 			new ArrayList<ArrayList<Point2D>>();
+	private List<ArrayList<Point2D>> linkedPoints2 =
+			new ArrayList<ArrayList<Point2D>>();
 	
 	private Random random = new Random();
 	private JFrame frame;
@@ -78,6 +80,11 @@ public class VisualHelper extends JPanel implements KeyListener {
 	public void addLinkedPoints(List<Point2D.Double> input) {
 		linkedPoints.add(new ArrayList<Point2D>());
 		linkedPoints.get(linkedPoints.size() - 1).addAll(input);
+	}
+	
+	public void addLinkedPoints2(List<Point2D.Double> input) {
+		linkedPoints2.add(new ArrayList<Point2D>());
+		linkedPoints2.get(linkedPoints2.size() - 1).addAll(input);
 	}
 	
 	public void clearAll() {
@@ -220,6 +227,26 @@ public class VisualHelper extends JPanel implements KeyListener {
 				int y2 = (int) (p2.getY() * panelHeight);	
 				g.drawLine(x1, panelHeight - y1, x2, panelHeight - y2);
 			}
+			
+			
+		}
+		for (int i = 0; i < linkedPoints2.size(); i++) {
+			
+			// Randomise color for each set of linked points
+			int color = random.nextInt(5);
+			g.setColor(Color.BLACK);
+			
+			for (int j = 0; j < linkedPoints2.get(i).size() - 1; j++) {
+				Point2D p1 = linkedPoints2.get(i).get(j);
+				Point2D p2 = linkedPoints2.get(i).get(j + 1);
+				int x1 = (int) (p1.getX() * panelWidth);
+				int y1 = (int) (p1.getY() * panelHeight);
+				int x2 = (int) (p2.getX() * panelWidth);
+				int y2 = (int) (p2.getY() * panelHeight);	
+				g.drawLine(x1, panelHeight - y1, x2, panelHeight - y2);
+			}
+			
+			
 		}
 	}
 
