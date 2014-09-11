@@ -125,12 +125,25 @@ public class ConfigGen {
 				// Here j >= 2
 				randVal = rndGen.nextFloat();
 				int divisor = 3;
+				double smallSquishDist = 0.2;
+				double squishDist = 0.15;
 				if (rectInterList.size() > 0) {
 					Point2D.Double ASVPosition = new ASVConfig(false,
 							coordsCFG, j).getPosition(j - 1);
+					// don't mess with the j and j - 1, works beautifully
 					Rectangle2D.Double r = rectInterList.get(0);
-					if (r.contains(ASVPosition)) {
-						divisor = 21;
+					if (r.contains(ASVPosition)
+							&& (r.getWidth() > smallSquishDist || r.getHeight() > smallSquishDist)) {
+						divisor = 25;
+						// System.out.println("Width, height & divisor = "
+						// + r.getWidth() + " " + r.getHeight() + " "
+						// + divisor);
+					} else if (r.contains(ASVPosition)
+							&& (r.getWidth() > squishDist || r.getHeight() > smallSquishDist)) {
+						divisor = 12;
+						System.out.println("Width, height & divisor = "
+								+ r.getWidth() + " " + r.getHeight() + " "
+								+ divisor);
 					} else {
 						divisor = 3;
 					}

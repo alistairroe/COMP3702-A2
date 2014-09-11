@@ -81,7 +81,7 @@ public class VisualHelperTester {
 			double maxLinkDist = 0.05;
 
 			ConfigGen cfGen = new ConfigGen(nSample, a.findPathCorners(path),
-					a.ps, a.getPassage(0.015, 0.005));
+					a.ps, a.getPassage(0.025, 0.005));
 
 			List<Point2D.Double> pos = a.ps.getInitialState().getASVPositions();
 			int deltaPos;

@@ -26,7 +26,7 @@ public class Alistair {
 		ps = new ProblemSpec();
 
 		try {
-			ps.loadProblem("src/testcases/7-ASV-x2.txt");
+			ps.loadProblem("src/testcases/7-ASV-x4.txt");
 		} catch (IOException e) {
 
 		}
@@ -55,36 +55,36 @@ public class Alistair {
 					valid = false;
 				}
 			}
-			for (Obstacle o : ps.getObstacles()) {
-				double delta = 0.001;
-				Rectangle2D rect = o.getRect();
-				Rectangle2D.Double grownRect = new Rectangle2D.Double(
-						rect.getX() - delta, rect.getY() - delta,
-						rect.getWidth() + delta * 2, rect.getHeight() + delta
-								* 2);
-
-				if (grownRect.getMaxY() + delta > newNode.getY()) {
-					if (newNode.getY() > grownRect.getMaxY()) {
-						newNode.y = grownRect.getMaxY() + delta;
-					}
-				}
-				if (grownRect.getMinY() - delta < newNode.getY()) {
-					if (newNode.getY() < grownRect.getMinY()) {
-						newNode.y = grownRect.getMinY() - delta;
-					}
-				}
-
-				if (grownRect.getMaxX() + delta > newNode.getX()) {
-					if (newNode.getX() > grownRect.getMaxX()) {
-						newNode.x = grownRect.getMaxX() + delta;
-					}
-				}
-				if (grownRect.getMinX() - delta < newNode.getX()) {
-					if (newNode.getX() < grownRect.getMinX()) {
-						newNode.x = grownRect.getMinX() - delta;
-					}
-				}
-			}
+			// for (Obstacle o : ps.getObstacles()) {
+			// double delta = 0.001;
+			// Rectangle2D rect = o.getRect();
+			// Rectangle2D.Double grownRect = new Rectangle2D.Double(
+			// rect.getX() - delta, rect.getY() - delta,
+			// rect.getWidth() + delta * 2, rect.getHeight() + delta
+			// * 2);
+			//
+			// if (grownRect.getMaxY() + delta > newNode.getY()) {
+			// if (newNode.getY() > grownRect.getMaxY()) {
+			// newNode.y = grownRect.getMaxY() + delta;
+			// }
+			// }
+			// if (grownRect.getMinY() - delta < newNode.getY()) {
+			// if (newNode.getY() < grownRect.getMinY()) {
+			// newNode.y = grownRect.getMinY() - delta;
+			// }
+			// }
+			//
+			// if (grownRect.getMaxX() + delta > newNode.getX()) {
+			// if (newNode.getX() > grownRect.getMaxX()) {
+			// newNode.x = grownRect.getMaxX() + delta;
+			// }
+			// }
+			// if (grownRect.getMinX() - delta < newNode.getX()) {
+			// if (newNode.getX() < grownRect.getMinX()) {
+			// newNode.x = grownRect.getMinX() - delta;
+			// }
+			// }
+			// }
 
 			if (valid) {
 				map.put(newNode, new HashMap<Node, Double>());
