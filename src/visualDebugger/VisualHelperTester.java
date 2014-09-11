@@ -17,6 +17,8 @@ import solution.AStarCfg;
 import solution.Alistair;
 import solution.ConfigGen;
 import solution.Node;
+import sun.security.timestamp.TSRequest;
+import tester.Tester;
 
 //import solution.ConfigGenOld;
 
@@ -53,7 +55,7 @@ public class VisualHelperTester {
 		int trial = 0;
 		while(path.isEmpty()){
 			System.out.print("Trial "+trial+" -> ");			
-			edges = a.createPRM(n1,n2,10000,0.02);
+			edges = a.createPRM(n1,n2,15000,0.02);
 			path = a.AStar(n1,n2);
 			trial++;
 			//ArrayList<Point2D.Double> corners = a.findPathCorners(path);
@@ -158,16 +160,18 @@ public class VisualHelperTester {
 				visualHelper.addLinkedPoints(cfg.getASVPositions());
 			}
 			
-			visualHelper.waitKey();
+			//visualHelper.waitKey();
 			//visualHelper.addRectangles(rects);
 			System.out.println("Removing redundancies...");
 			
 			AStarCfg aStarSolver = new AStarCfg(cfGen.getConfigMap()); //ASTAR!
 			ArrayList<ASVConfig> validConfigs=aStarSolver.AStar(a.ps.getInitialState(), a.ps.getGoalState());
 			
+			List<ASVConfig> validConfigs2 = a.interpolateSolution(validConfigs);
+			
 			visualHelper.repaint();
 			
-			visualHelper.waitKey();
+			//visualHelper.waitKey();
 			System.out.println("Showing valid paths...");
 			visualHelper.clearAll();
 			visualHelper.addRectangles(rects);
@@ -177,13 +181,42 @@ public class VisualHelperTester {
 				visualHelper.addPoints(cfg.getASVPositions());
 				visualHelper.addLinkedPoints(cfg.getASVPositions());
 			}
+			
 			visualHelper.repaint();
-			a.ps.setPath(validConfigs);
+			visualHelper.waitKey();
+			visualHelper.clearAll();
+			visualHelper.addRectangles(rects);
+
+			//List<ASVConfig> validConfigs = new ArrayList<ASVConfig>(); 
+			for (ASVConfig cfg: validConfigs2){
+				visualHelper.addPoints(cfg.getASVPositions());
+				visualHelper.addLinkedPoints(cfg.getASVPositions());
+			}
+			for (ASVConfig cfg: validConfigs){
+				visualHelper.addPoints(cfg.getASVPositions());
+				visualHelper.addLinkedPoints2(cfg.getASVPositions());
+			}
+			
+			a.ps.setPath(validConfigs2);
 			try {
 				a.ps.saveSolution("src/testcases/test_out.txt");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			Tester tester = new Tester(a.ps);
+			System.out.println(tester.getInvalidBoomStates());
+			System.out.println(tester.getInvalidAreaStates());
+			System.out.println(tester.getNonConvexStates());
+			System.out.println(tester.getCollidingStates());
+			//visualHelper.clearAll();
+//			List<List<Point2D.Double>> list3 = new ArrayList<List<Point2D.Double>>();
+//			for(Integer m : tester.getInvalidBoomStates()) {
+//				list3.add(validConfigs2.get(m).getASVPositions());
+//			}
+//			for(List<Point2D.Double> list6 : list3) {
+//				visualHelper.addLinkedPoints(list6);
+//			}
+//			visualHelper.repaint();
 		}
 		
 		visualHelper.repaint();

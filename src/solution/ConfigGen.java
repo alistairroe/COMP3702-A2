@@ -80,9 +80,13 @@ public class ConfigGen {
 			Rectangle2D.Double r = intersectList2.get(0);
 			if(r.getWidth() < r.getHeight()) {
 				r.x = r.x - (deltaBig - r.getWidth());
+				r.y = r.y + r.height/4;
+				r.height = r.height/2;
 				r.width = r.width + (deltaBig*2 - r.width);
 			} else {
 				r.y = r.y - (deltaBig - r.getHeight());
+				r.x = r.x + r.width/4;
+				r.width = r.width/2;
 				r.height = r.height + (deltaBig*2 - r.height);
 			}
 		}
@@ -140,25 +144,22 @@ public class ConfigGen {
 		
 		int divisor = 3;
 		
-		if(intersectList2.size() > 0) {
-			System.out.println(intersectList2.get(0).toString());
-			Rectangle2D.Double r = intersectList2.get(0);
-			
-			
-			
-			
-			if(r.contains(n)) {
-				divisor = 24;
-				System.out.println(divisor);
-			}
-			
-		}
+//		if(intersectList2.size() > 0) {
+//			System.out.println(intersectList2.get(0).toString());
+//			Rectangle2D.Double r = intersectList2.get(0);
+//
+//			if(r.contains(n)) {
+//				divisor = 24;
+//				System.out.println(divisor);
+//			}
+//			
+//		}
 		if(configs.size() > ps.getASVCount()) {
 			for(int l = 0; l < ps.getASVCount(); l++) {
 				ASVConfig cfg1 = moveASVsAlong(configs.get(configs.size() - 1 - ps.getASVCount()),new Node(n2),n);
 				if (tester.hasValidBoomLengths(cfg1) && tester.hasEnoughArea(cfg1)
 						&& tester.fitsBounds(cfg1) && tester.isConvex(cfg1)
-						&& !tester.hasCollision(cfg1, this.ps.getObstacles())) {
+						&& !tester.hasCollision2(cfg1, this.ps.getObstacles())) {
 					configs.add(cfg1);
 					//configs2.add(cfg1);
 					System.out.println("Moved one added.");
@@ -318,7 +319,7 @@ public class ConfigGen {
 
 
 		List<Point2D.Double> list1 = new ArrayList<Point2D.Double>();
-		for (Point2D.Double point : conf.getASVPositions()) {
+		for (Point2D point : conf.getASVPositions()) {
 			double newx = point.getX() + direction0.getDistanceTo(direction1)* Math.cos(angle0);
 			double newy = point.getY() + direction0.getDistanceTo(direction1)* Math.sin(angle0);
 			list1.add(new Point2D.Double(newx, newy));
