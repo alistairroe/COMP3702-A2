@@ -58,22 +58,32 @@ public class Alistair {
 			for (Obstacle o : ps.getObstacles()) {
 				double delta = 0.001;
 				Rectangle2D rect = o.getRect();
-				// Rectangle2D.Double grownRect = new
-				// Rectangle2D.Double(rect.getX() - delta, rect.getY() -
-				// delta,rect.getWidth() + delta * 2, rect.getHeight() + delta *
-				// 2);
+				Rectangle2D.Double grownRect = new Rectangle2D.Double(
+						rect.getX() - delta, rect.getY() - delta,
+						rect.getWidth() + delta * 2, rect.getHeight() + delta
+								* 2);
 
-				if (rect.getMaxY() + delta > newNode.getY()) {
-					if (newNode.getY() > rect.getMaxY()) {
-						newNode.y = rect.getMaxY() + delta;
+				if (grownRect.getMaxY() + delta > newNode.getY()) {
+					if (newNode.getY() > grownRect.getMaxY()) {
+						newNode.y = grownRect.getMaxY() + delta;
 					}
 				}
-				if (rect.getMinY() - delta < newNode.getY()) {
-					if (newNode.getY() < rect.getMinY()) {
-						newNode.y = rect.getMinY() - delta;
+				if (grownRect.getMinY() - delta < newNode.getY()) {
+					if (newNode.getY() < grownRect.getMinY()) {
+						newNode.y = grownRect.getMinY() - delta;
 					}
 				}
 
+				if (grownRect.getMaxX() + delta > newNode.getX()) {
+					if (newNode.getX() > grownRect.getMaxX()) {
+						newNode.x = grownRect.getMaxX() + delta;
+					}
+				}
+				if (grownRect.getMinX() - delta < newNode.getX()) {
+					if (newNode.getX() < grownRect.getMinX()) {
+						newNode.x = grownRect.getMinX() - delta;
+					}
+				}
 			}
 
 			if (valid) {
@@ -226,7 +236,7 @@ public class Alistair {
 		rectInterList = new ArrayList<Rectangle2D.Double>();
 
 		for (Obstacle o : this.ps.getObstacles()) {
-			// double deltaSmall = 0.005;
+			// original double deltaSmall = 0.005;
 			Rectangle2D rect = o.getRect();
 			Rectangle2D.Double grownRect = new Rectangle2D.Double(rect.getX()
 					- deltaSmall, rect.getY() - deltaSmall, rect.getWidth()
@@ -242,7 +252,7 @@ public class Alistair {
 		}
 
 		for (Obstacle o : this.ps.getObstacles()) {
-			// deltaBig = 0.025;
+			// original deltaBig = 0.025;
 			Rectangle2D rect = o.getRect();
 			Rectangle2D.Double grownRect = new Rectangle2D.Double(rect.getX()
 					- deltaBig, rect.getY() - deltaBig, rect.getWidth()
@@ -289,6 +299,13 @@ public class Alistair {
 		List<Node> list1 = new ArrayList<Node>();
 		list1.add(n0);
 		while (list1.get(list1.size() - 1).getDistanceTo(n1) > interpStep) {
+			// if (rectInterList.size() > 0) {
+			// Rectangle2D.Double r = rectInterList.get(0);
+			// if (r.contains(n0)) {
+			// interpStep = 0.001;
+			// }
+			// }
+			// System.out.println(interpStep);
 			double newx = list1.get(list1.size() - 1).getX() + interpStep
 					* Math.cos(angle1);
 			double newy = list1.get(list1.size() - 1).getY() + interpStep

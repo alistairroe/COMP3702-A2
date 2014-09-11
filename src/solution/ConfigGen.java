@@ -126,15 +126,14 @@ public class ConfigGen {
 				randVal = rndGen.nextFloat();
 				int divisor = 3;
 				if (rectInterList.size() > 0) {
-					// for (Rectangle2D.Double r : rectInterList) {
+					Point2D.Double ASVPosition = new ASVConfig(false,
+							coordsCFG, j).getPosition(j - 1);
 					Rectangle2D.Double r = rectInterList.get(0);
-					if (r.contains(new ASVConfig(false, coordsCFG, j)
-							.getPosition(j - 2))) {
-						divisor = 24;
-						// divisor = 24;
+					if (r.contains(ASVPosition)) {
+						divisor = 21;
+					} else {
+						divisor = 3;
 					}
-					// rectInterList.remove(0);
-					// }
 				}
 				coordsCFG[j + 1] = tester.normaliseAngle(coordsCFG[j]
 						+ convexity * randVal * 2 * Math.PI / divisor);
