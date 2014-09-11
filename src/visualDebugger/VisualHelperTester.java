@@ -24,6 +24,7 @@ public class VisualHelperTester {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		final long startTime = System.currentTimeMillis();
 
 		Alistair a = new Alistair();
 		Node n1 = new Node(a.ps.getInitialState().getASVPositions()
@@ -43,7 +44,7 @@ public class VisualHelperTester {
 		}
 		VisualHelper visualHelper = new VisualHelper();
 
-		System.out.println(path);
+		// System.out.println(path);
 		List<Node> interpolatedPath = new ArrayList<Node>();
 		for (int i = 1; i < path.size(); i++) {
 			interpolatedPath.addAll(a.interpolateNodes(path.get(i - 1),
@@ -80,7 +81,7 @@ public class VisualHelperTester {
 			double maxLinkDist = 0.05;
 
 			ConfigGen cfGen = new ConfigGen(nSample, a.findPathCorners(path),
-					a.ps);
+					a.ps, a.getPassage(0.025, 0.005));
 
 			List<Point2D.Double> pos = a.ps.getInitialState().getASVPositions();
 			int deltaPos;
@@ -102,8 +103,8 @@ public class VisualHelperTester {
 			}
 
 			// ConfigGenOld cfGen = new ConfigGenOld(nSample);
-			cfGen.setPS(a.ps);
-
+			// cfGen.setPS(a.ps);
+			System.out.print("Sampling Around Nodes...");
 			for (Node n : interpolatedPath) {
 				Point2D.Double prevN = l.remove(0);
 				l.add(n.toPoint2D());
@@ -118,8 +119,14 @@ public class VisualHelperTester {
 				// //visualHelper.repaint();
 				// //visualHelper.addPoints(cfg.getASVPositions().g);
 				// }
-				System.out.println("Sampling Around Node: " + i + "/"
-						+ interpolatedPath.size());
+
+				double percent = (100.0 * i) / interpolatedPath.size();
+				if (percent % 5 < 0.005) {
+					System.out.print((int) percent + "%...");
+
+				}
+				// System.out.println("Sampling Around Node: " + i + "/"
+				// + interpolatedPath.size());
 				i++;
 
 				// try{
@@ -128,8 +135,8 @@ public class VisualHelperTester {
 				//
 				// }
 			}
+			System.out.println();
 			visualHelper.repaint();
-			System.out.println("Linking Configurations...");
 			cfGen.linkConfigs(maxLinkDist); // TO DO: if failed, try again!
 			// Wait for user key press
 			// visualHelper.waitKey();
@@ -170,6 +177,10 @@ public class VisualHelperTester {
 				e.printStackTrace();
 			}
 		}
+
+		final long endTime = System.currentTimeMillis();
+		System.out.println("Total execution time: " + (endTime - startTime)
+				/ 1000.0);
 
 		visualHelper.repaint();
 
