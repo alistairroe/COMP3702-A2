@@ -52,7 +52,7 @@ public class Tester {
 	}
 
 	/** Remembers the specifications of the problem. */
-	private ProblemSpec ps;
+	private ProblemSpec ps = new ProblemSpec();
 	/** The maximum error allowed by this Tester */
 	private double maxError;
 	/** The workspace bounds, with allowable error. */
@@ -63,12 +63,6 @@ public class Tester {
 	 */
 	public Tester() {
 		this(DEFAULT_MAX_ERROR);
-		this.ps = new ProblemSpec();
-	}
-	
-	public Tester(ProblemSpec ps) {
-		this(DEFAULT_MAX_ERROR);
-		this.ps = ps;
 	}
 
 	/**
@@ -235,7 +229,6 @@ public class Tester {
 		List<ASVConfig> path = ps.getPath();
 		for (int i = 0; i < path.size(); i++) {
 			if (!hasValidBoomLengths(path.get(i))) {
-				System.out.println("Config "+i);
 				badStates.add(i);
 			}
 		}
@@ -257,10 +250,8 @@ public class Tester {
 			double boomLength = p0.distance(p1);
 			//System.out.println(boomLength);
 			if (boomLength < MIN_BOOM_LENGTH - maxError) {
-				System.out.println(boomLength);
 				return false;
 			} else if (boomLength > MAX_BOOM_LENGTH + maxError) {
-				System.out.println(boomLength);
 				return false;
 			}
 		}
@@ -539,27 +530,6 @@ public class Tester {
 	public boolean hasCollision(ASVConfig cfg, List<Obstacle> obstacles) {
 		for (Obstacle o : obstacles) {
 			if (hasCollision(cfg, o)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean hasCollision2(ASVConfig cfg, List<Obstacle> obstacles) {
-		for (Obstacle o : obstacles) {
-			if (hasCollision2(cfg, o)) {
-				return true;
-			}
-		}
-		return false;
-		
-	}
-	public boolean hasCollision2(ASVConfig cfg, Obstacle o) {
-		Rectangle2D lenientRect = grow(o.getRect(), 0.01);
-		List<Point2D.Double> points = cfg.getASVPositions();
-		for (int i = 1; i < points.size(); i++) {
-			if (new Line2D.Double(points.get(i - 1), points.get(i))
-					.intersects(lenientRect)) {
 				return true;
 			}
 		}
