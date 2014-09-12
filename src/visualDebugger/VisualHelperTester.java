@@ -37,7 +37,7 @@ public class VisualHelperTester {
 		int trial = 0;
 		while (path.isEmpty()) {
 			System.out.print("Trial " + trial + " -> ");
-			edges = a.createPRM(n1, n2, 10000, 0.02);
+			edges = a.createPRM(n1, n2, 15000, 0.02);
 			path = a.AStar(n1, n2);
 			trial++;
 			// ArrayList<Point2D.Double> corners = a.findPathCorners(path);
@@ -120,8 +120,8 @@ public class VisualHelperTester {
 				// //visualHelper.addPoints(cfg.getASVPositions().g);
 				// }
 
-				double percent = (100.0 * i) / interpolatedPath.size();
-				if (percent % 5 < 0.005) {
+				double percent = ((100.0 * i) / interpolatedPath.size());
+				if (percent % 5 < 0.5) {
 					System.out.print((int) percent + "%...");
 
 				}
@@ -149,7 +149,7 @@ public class VisualHelperTester {
 				visualHelper.addLinkedPoints(cfg.getASVPositions());
 			}
 
-			visualHelper.waitKey();
+			//visualHelper.waitKey();
 			// visualHelper.addRectangles(rects);
 			System.out.println("Removing redundancies...");
 
@@ -163,14 +163,14 @@ public class VisualHelperTester {
 			System.out.println("Showing valid paths...");
 			visualHelper.clearAll();
 			visualHelper.addRectangles(rects);
-
+			List<ASVConfig> validConfigs2 = a.interpolateSolution(validConfigs);
 			// List<ASVConfig> validConfigs = new ArrayList<ASVConfig>();
-			for (ASVConfig cfg : validConfigs) {
+			for (ASVConfig cfg : validConfigs2) {
 				visualHelper.addPoints(cfg.getASVPositions());
 				visualHelper.addLinkedPoints(cfg.getASVPositions());
 			}
 			visualHelper.repaint();
-			a.ps.setPath(validConfigs);
+			a.ps.setPath(validConfigs2);
 			try {
 				a.ps.saveSolution("src/testcases/test_out.txt");
 			} catch (IOException e) {

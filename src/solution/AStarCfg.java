@@ -132,7 +132,7 @@ public class AStarCfg {
 		if (currentCfg.equals(startCfg)) { // Base Case
 			// Array is in reverse order so reverse
 			ArrayList<ASVConfig> sortedPath = new ArrayList<ASVConfig>();
-			for (int i = pathList.size() - 1; i > 0; i--) {
+			for (int i = pathList.size() - 1; i > -1; i--) {
 				sortedPath.add(pathList.get(i));
 			}
 			return sortedPath;

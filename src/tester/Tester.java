@@ -556,6 +556,27 @@ public class Tester {
 		}
 		return false;
 	}
+	
+	public boolean hasCollision2(ASVConfig cfg, List<Obstacle> obstacles) {
+		for (Obstacle o : obstacles) {
+			if (hasCollision2(cfg, o)) {
+				return true;
+			}
+		}
+		return false;
+		
+	}
+	public boolean hasCollision2(ASVConfig cfg, Obstacle o) {
+		Rectangle2D lenientRect = grow(o.getRect(), 0.01);
+		List<Point2D.Double> points = cfg.getASVPositions();
+		for (int i = 1; i < points.size(); i++) {
+			if (new Line2D.Double(points.get(i - 1), points.get(i))
+					.intersects(lenientRect)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Checks that the total cost of the solution is correctly calculated.
