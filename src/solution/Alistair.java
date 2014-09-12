@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-
-
 import problem.ASVConfig;
 //import java.util.Set;
 //import java.util.Map.Entry;
@@ -26,13 +24,12 @@ public class Alistair {
 	public Tester tester;
 	HashMap<Node, HashMap<Node, Double>> map;
 	List<Rectangle2D.Double> rectInterList = new ArrayList<Rectangle2D.Double>();
-	public HashMap<Integer,Double> distanceMap = new HashMap<Integer,Double>();
-	public HashMap<Integer, Double> scalars = new HashMap<Integer,Double>();
+	public HashMap<Integer, Double> distanceMap = new HashMap<Integer, Double>();
+	public HashMap<Integer, Double> scalars = new HashMap<Integer, Double>();
 
 	public Alistair() {
 		ps = new ProblemSpec();
 		tester = new Tester();
-		
 
 		try {
 			ps.loadProblem("src/testcases/7ASV.txt");
@@ -51,7 +48,8 @@ public class Alistair {
 
 		map.put(start, new HashMap<Node, Double>());
 		map.put(end, new HashMap<Node, Double>());
-
+		List<Rectangle2D.Double> rectList = getPassage(0.02, 0.005);
+		// System.out.println(rectList.get(0));
 		boolean valid = true;
 		// graph.addVertex(newNode);
 		for (int i = 0; i < N; i++) {
@@ -59,40 +57,21 @@ public class Alistair {
 					generator.nextDouble());
 			valid = true;
 			for (Obstacle o : ps.getObstacles()) {
-				double delta = 0.005;
-				 Rectangle2D rect = o.getRect();
-				 Rectangle2D.Double grownRect = new Rectangle2D.Double(
-				 rect.getX() - delta, rect.getY() - delta,
-				 rect.getWidth() + delta * 2, rect.getHeight() + delta
-				 * 2);
+				double delta = 0.003;
+				Rectangle2D rect = o.getRect();
+				Rectangle2D.Double grownRect = new Rectangle2D.Double(
+						rect.getX() - delta, rect.getY() - delta,
+						rect.getWidth() + delta * 2, rect.getHeight() + delta
+								* 2);
 				if (grownRect.contains(newNode)) {
 					// System.out.println("Point discarded");
 					valid = false;
 				}
+
 			}
-			
-			//
-			// if (grownRect.getMaxY() + delta > newNode.getY()) {
-			// if (newNode.getY() > grownRect.getMaxY()) {
-			// newNode.y = grownRect.getMaxY() + delta;
-			// }
-			// }
-			// if (grownRect.getMinY() - delta < newNode.getY()) {
-			// if (newNode.getY() < grownRect.getMinY()) {
-			// newNode.y = grownRect.getMinY() - delta;
-			// }
-			// }
-			//
-			// if (grownRect.getMaxX() + delta > newNode.getX()) {
-			// if (newNode.getX() > grownRect.getMaxX()) {
-			// newNode.x = grownRect.getMaxX() + delta;
-			// }
-			// }
-			// if (grownRect.getMinX() - delta < newNode.getX()) {
-			// if (newNode.getX() < grownRect.getMinX()) {
-			// newNode.x = grownRect.getMinX() - delta;
-			// }
-			// }
+
+			// if(rectList.get(0).contains(newNode)) {
+			// newNode.y = rectList.get(0).getMinY()+0.003;
 			// }
 
 			if (valid) {
@@ -289,17 +268,19 @@ public class Alistair {
 			Rectangle2D.Double r = rectInterList.get(0);
 			if (r.getWidth() < r.getHeight()) {
 				r.x = r.x - (deltaBig - r.getWidth());
-				r.y = r.y + r.height/4;
-				r.height = r.height/2;
+				// r.y = r.y + deltaBig;
+				r.y = r.y + r.width / 4;
+				r.height = r.height - deltaBig * 2;
 				r.width = r.width + (deltaBig * 2 - r.width);
 			} else {
-				r.x = r.x + r.width/4;
+				// r.x = r.x + deltaBig;
+				r.x = r.x + r.height / 4;
 				r.y = r.y - (deltaBig - r.getHeight());
-				r.width = r.width/2;
+				r.width = r.width - deltaBig * 2;
 				r.height = r.height + (deltaBig * 2 - r.height);
 			}
 		}
-		//System.out.println(rectInterList);
+		// System.out.println(rectInterList);
 		return rectInterList;
 	}
 
@@ -327,277 +308,488 @@ public class Alistair {
 		}
 		return list1;
 	}
-	
+
 	public List<ASVConfig> interpolateSolution(ArrayList<ASVConfig> path) {
 		List<ASVConfig> interpolatedPath = new ArrayList<ASVConfig>();
 		System.out.println(path.get(0));
 		double step = 0.0008;
 		resetScalars();
 		int asvCount = path.get(0).getASVCount();
-		int asvMid = asvCount/2;
+		int asvMid = asvCount / 2;
 		boolean override = false;
-		for(int i = 1; i < path.size(); i++) {
+		ASVConfig source = path.get(0);
+		ASVConfig dest = path.get(1);
+		ASVConfig prevConf = new ASVConfig(source);
+		ASVConfig newConf;
+		for (int i = 1; i < path.size(); i++) {
 			System.out.println("Node: " + i);
-			interpolatedPath.add(path.get(i-1));
-			ASVConfig source = path.get(i - 1);
-			ASVConfig dest = path.get(i);
-			//double dist = dest.getPosition(asvMid).distance(source.getPosition(asvMid));
-			double angle = Math.atan2(dest.getPosition(asvMid).getY() - source.getPosition(asvMid).getY(),
-					dest.getPosition(asvMid).getX() - source.getPosition(asvMid).getX());
-			
-			ASVConfig newConf = new ASVConfig(source);
-			ASVConfig prevConf = new ASVConfig(source);
+			System.out.println("Length of interpolated path: "
+					+ interpolatedPath.size());
+			System.out.println("Distance between prevConf and source: "
+					+ prevConf.maxDistance(path.get(i - 1)));
+			// interpolatedPath.add(path.get(i-1));
+			// ASVConfig source = path.get(i - 1);
+			dest = path.get(i);
+			// double dist =
+			// dest.getPosition(asvMid).distance(source.getPosition(asvMid));
+			double angle = Math.atan2(
+					dest.getPosition(asvMid).getY()
+							- prevConf.getPosition(asvMid).getY(),
+					dest.getPosition(asvMid).getX()
+							- prevConf.getPosition(asvMid).getX());
+			// ASVConfig prevConf = new ASVConfig(source);
+			newConf = new ASVConfig(prevConf);
+
 			int m = 0;
-			while(prevConf.maxDistance(dest) > 0.001) {
-				//System.out.println("D: " + newConf.maxDistance(dest));
-//				if(m > 1000) {
-//					System.out.println("Max m reached");
-//					return interpolatedPath;
-//				}
+			while (prevConf.maxDistance(dest) > 0.0008) {
+				// System.out.println("D: " + newConf.maxDistance(dest));
+				// if(m > 1000) {
+				// System.out.println("Max m reached");
+				// return interpolatedPath;
+				// }
 				int k = 0;
-				while((newConf.maxDistance(prevConf) > 0.001)||(k == 0)) {
-					if(k > 10) {
+				while ((newConf.maxDistance(prevConf) > 0.001) || (k == 0)) {
+					if (k > 10) {
 						System.out.println("Max k reached");
 						return interpolatedPath;
 					}
-					
-					//System.out.println(newConf.getASVPositions());
+
+					// System.out.println(newConf.getASVPositions());
 					boolean valid = false;
-					
-					HashMap<Integer,Point2D> newPosMap = new HashMap<Integer,Point2D>();
-					//System.out.println("Step: " + step);
-					//System.out.println("Before new loop:");
+
+					HashMap<Integer, Point2D> newPosMap = new HashMap<Integer, Point2D>();
+					// System.out.println("Step: " + step);
+					// System.out.println("Before new loop:");
 					int z = 1;
-					while(!valid) {
-						if(z > 50) {
+					List<Point2D.Double> newASVPositions = new ArrayList<Point2D.Double>();
+					while (!valid) {
+						if (z > 50) {
 							interpolatedPath.add(path.get(i));
 							return interpolatedPath;
 						}
-						z++;
+
 						valid = true;
-						//System.out.println("Before getnextstep");
-						newPosMap = getNextStep(prevConf,dest,asvMid,asvCount,step,angle,override);
-						//System.out.println("After getnextstep");
-						for(int q = 0; q < newPosMap.size();q++) {
-							//System.out.println(q);
-							if(q < asvMid) {
+						// System.out.println("Before getnextstep");
+						newPosMap = getNextStep(prevConf, dest, asvMid,
+								asvCount, step, angle, override);
+						// System.out.println("After getnextstep");
+						for (int q = 0; q < newPosMap.size(); q++) {
+							// System.out.println(q);
+							if (q < asvMid) {
 								for (Obstacle o : ps.getObstacles()) {
-									if(new Line2D.Double(newPosMap.get(q),newPosMap.get(q+1)).intersects(o.getRect())) {
-										System.out.println("Collision");
-										System.out.println(q);
-										System.out.println(m);
+									if (new Line2D.Double(newPosMap.get(q),
+											newPosMap.get(q + 1)).intersects(o
+											.getRect())) {
+										// System.out.println("Collision");
+										// System.out.println(q);
+										// System.out.println(m);
 										valid = false;
-										
-										if(Math.abs(tester.normaliseAngle(Math.atan2(dest.getPosition(q).getY() - prevConf.getPosition(q).getY(),dest.getPosition(q).getX() - prevConf.getPosition(q).getX()) - Math.atan2(o.getRect().getCenterY() - prevConf.getPosition(q).getY(),o.getRect().getCenterX() - prevConf.getPosition(q).getX())))< Math.PI/2) {
-											//distanceMap.put(q,distanceMap.get(q)*0.2);
-											System.out.println("Moving towards obstacle");
-											
-											scalars.put(q, 0.2/z);
-										} else {
-											//distanceMap.put(q,distanceMap.get(q)*5);
-											System.out.println("Moving away from obstacle");
-											//override = true;
-											scalars.put(q, z*5.0);
-											//return interpolatedPath;
+
+										if (Math.abs(tester.normaliseAngle(Math
+												.atan2(dest.getPosition(q)
+														.getY()
+														- prevConf.getPosition(
+																q).getY(),
+														dest.getPosition(q)
+																.getX()
+																- prevConf
+																		.getPosition(
+																				q)
+																		.getX())
+												- Math.atan2(
+														o.getRect()
+																.getCenterY()
+																- prevConf
+																		.getPosition(
+																				q)
+																		.getY(),
+														o.getRect()
+																.getCenterX()
+																- prevConf
+																		.getPosition(
+																				q)
+																		.getX()))) < Math.PI / 2) {
+											// distanceMap.put(q,distanceMap.get(q)*0.2);
+											// System.out.println("Moving towards obstacle");
+											if (z == 1) {
+												scalars.put(q, 0.2);
+											} else if (z == 2) {
+												scalars.put(q, 5.0);
+											} else
+												scalars.put(q, 0.05);
 										}
+
 									} else {
-										
+										// distanceMap.put(q,distanceMap.get(q)*5);
+										// System.out.println("Moving away from obstacle");
+										// override = true;
+										if (z == 1) {
+											scalars.put(q, 5.0);
+										} else if (z == 2) {
+											scalars.put(q, 0.2);
+										} else
+											scalars.put(q, 10.0);
 									}
+									// return interpolatedPath;
+									if (z == 10) {
+										resetScalars();
+										double angle2 = Math.atan2(prevConf
+												.getPosition(asvMid).getY()
+												- o.getRect().getCenterY(),
+												prevConf.getPosition(asvMid)
+														.getX()
+														- o.getRect()
+																.getCenterX());
+										// path.add(i, prevConf.shiftASVs(new
+										// Point2D.Double(0.05*Math.cos(angle2),0.05*Math.sin(angle2))));
+										dest = prevConf
+												.shiftASVs(new Point2D.Double(
+														0.05 * Math.cos(angle2),
+														0.05 * Math.sin(angle2)));
+										angle = Math.atan2(
+												dest.getPosition(asvMid).getY()
+														- prevConf.getPosition(
+																asvMid).getY(),
+												dest.getPosition(asvMid).getX()
+														- prevConf.getPosition(
+																asvMid).getX());
+										System.out.println("Movin out");
+										System.out.println("Top z = " + z);
+										System.out.println("q = " + q);
+									}
+
 								}
 							} else if (q == asvMid) {
-								
+
 							} else if (q > asvMid) {
-							
+
 								for (Obstacle o : ps.getObstacles()) {
-									if(new Line2D.Double(newPosMap.get(q),newPosMap.get(q-1)).intersects(o.getRect())) {
+									if (new Line2D.Double(newPosMap.get(q),
+											newPosMap.get(q - 1)).intersects(o
+											.getRect())) {
 										valid = false;
-//											if(Math.abs(tester.normaliseAngle(Math.atan2(newPosMap.get(q+1).getY() - prevConf.getPosition(q+1).getY(),newPosMap.get(q+1).getX() - prevConf.getPosition(q+1).getX()) - Math.atan2(newPosMap.get(q).getY() - prevConf.getPosition(q).getY(),newPosMap.get(q).getX() - prevConf.getPosition(q).getX())))< Math.PI/2) {
-										System.out.println("Collision");
-										System.out.println(q);
-										System.out.println(m);
-										if(Math.abs(tester.normaliseAngle(Math.atan2(dest.getPosition(q).getY() - prevConf.getPosition(q).getY(),dest.getPosition(q).getX() - prevConf.getPosition(q).getX()) - Math.atan2(o.getRect().getCenterY() - prevConf.getPosition(q).getY(),o.getRect().getCenterX() - prevConf.getPosition(q).getX())))< Math.PI/2) {
-											//distanceMap.put(q,distanceMap.get(q)*0.2);
-											System.out.println("Moving towards obstacle");
-											//override = true;
-											scalars.put(q, 0.2/z);
+										// if(Math.abs(tester.normaliseAngle(Math.atan2(newPosMap.get(q+1).getY()
+										// -
+										// prevConf.getPosition(q+1).getY(),newPosMap.get(q+1).getX()
+										// - prevConf.getPosition(q+1).getX()) -
+										// Math.atan2(newPosMap.get(q).getY() -
+										// prevConf.getPosition(q).getY(),newPosMap.get(q).getX()
+										// - prevConf.getPosition(q).getX())))<
+										// Math.PI/2) {
+										// System.out.println("Collision");
+										// System.out.println(q);
+										// System.out.println(m);
+										if (Math.abs(tester.normaliseAngle(Math
+												.atan2(dest.getPosition(q)
+														.getY()
+														- prevConf.getPosition(
+																q).getY(),
+														dest.getPosition(q)
+																.getX()
+																- prevConf
+																		.getPosition(
+																				q)
+																		.getX())
+												- Math.atan2(
+														o.getRect()
+																.getCenterY()
+																- prevConf
+																		.getPosition(
+																				q)
+																		.getY(),
+														o.getRect()
+																.getCenterX()
+																- prevConf
+																		.getPosition(
+																				q)
+																		.getX()))) < Math.PI / 2) {
+											// distanceMap.put(q,distanceMap.get(q)*0.2);
+											// System.out.println("Moving towards obstacle");
+											// override = true;
+											if (z == 1) {
+												scalars.put(q, 0.2);
+											} else if (z == 2) {
+												scalars.put(q, 5.0);
+											} else {
+												scalars.put(q, 0.05);
+											}
 										} else {
-											//distanceMap.put(q,distanceMap.get(q)*5);
-											System.out.println("Moving away from obstacle");
-											scalars.put(q, z*5.0);
-											//override = true;
+											// distanceMap.put(q,distanceMap.get(q)*5);
+											// System.out.println("Moving away from obstacle");
+											if (z == 1) {
+												scalars.put(q, 5.0);
+											} else if (z == 2) {
+												scalars.put(q, 0.2);
+											} else {
+												scalars.put(q, 10.0);
+											}
+											// override = true;
 										}
-									} else {
-										//System.out.println("no collisions");
-										
+										if (z == 10) {
+											resetScalars();
+											double angle2 = Math
+													.atan2(prevConf
+															.getPosition(asvMid)
+															.getY()
+															- o.getRect()
+																	.getCenterY(),
+															prevConf.getPosition(
+																	asvMid)
+																	.getX()
+																	- o.getRect()
+																			.getCenterX());
+											// path.add(i,
+											// prevConf.shiftASVs(new
+											// Point2D.Double(0.05*Math.cos(angle2),0.05*Math.sin(angle2))));
+											dest = prevConf
+													.shiftASVs(new Point2D.Double(
+															0.05 * Math
+																	.cos(angle2),
+															0.05 * Math
+																	.sin(angle2)));
+											angle = Math
+													.atan2(dest.getPosition(
+															asvMid).getY()
+															- prevConf
+																	.getPosition(
+																			asvMid)
+																	.getY(),
+															dest.getPosition(
+																	asvMid)
+																	.getX()
+																	- prevConf
+																			.getPosition(
+																					asvMid)
+																			.getX());
+											System.out.println("Movin out");
+											System.out.println("z = " + z);
+											System.out.println("q = " + q);
+										}
+
 									}
-									
 								}
 							}
 						}
+						List<Point2D.Double> tempList = new ArrayList<Point2D.Double>();
+						for (int j = 0; j < asvCount; j++) {
+							tempList.add(new Point2D.Double(newPosMap.get(j)
+									.getX(), newPosMap.get(j).getY()));
+						}
+
+						if ((!tester.isConvex(new ASVConfig(tempList)))
+								&& z == 1) {
+							valid = false;
+							scalars.put(0, 5.0);
+						} else if (!tester.isConvex(new ASVConfig(tempList))) {
+							valid = false;
+							scalars.put(asvCount - 1, 5.0);
+						}
+						z++;
+						// System.out.println("After new while loop");
 					}
-					//System.out.println("After new while loop");
-					
-					
-					List<Point2D.Double> newASVPositions = new ArrayList<Point2D.Double>();
-					for(int j = 0; j < asvCount; j++) {
-						newASVPositions.add(new Point2D.Double(newPosMap.get(j).getX(),newPosMap.get(j).getY()));
+					for (int j = 0; j < asvCount; j++) {
+						newASVPositions.add(new Point2D.Double(newPosMap.get(j)
+								.getX(), newPosMap.get(j).getY()));
 					}
-					
-					//step = step / 2;
-					//System.out.println(newASVPositions);
-					//System.out.println(newASVPositions);
-					//prevConf = new ASVConfig(newConf);
+					// step = step / 2;
+					// System.out.println(newASVPositions);
+					// System.out.println(newASVPositions);
+					// prevConf = new ASVConfig(newConf);
 					newConf = new ASVConfig(newASVPositions);
-					//System.out.println(newASVPositions);
-					//System.out.println("Distance moved for k= "+k+" : " + newConf.maxDistance(prevConf));
-					//System.out.println("Step size: " + step);
-					//System.out.println("Step: " + step);
-					step = step *(0.0008/newConf.maxDistance(prevConf));
-					//System.out.println("New Step: "+ step);
-					//System.out.println("Step distance: " + newConf.maxDistance(prevConf));
-					//System.out.println("D: " + newConf.maxDistance(dest));
-					//System.out.println("k: "+ k);
+					// System.out.println(newASVPositions);
+					// System.out.println("Distance moved for k= "+k+" : " +
+					// newConf.maxDistance(prevConf));
+					// System.out.println("Step size: " + step);
+					// System.out.println("Step: " + step);
+					step = step * (0.0008 / newConf.maxDistance(prevConf));
+					// System.out.println("New Step: "+ step);
+					// System.out.println("Step distance: " +
+					// newConf.maxDistance(prevConf));
+					// System.out.println("D: " + newConf.maxDistance(dest));
+					// System.out.println("k: "+ k);
 					k++;
-					
+
 				} // IMPLEMENT ANOTHER WHILE
-				//System.out.println(k);
+					// System.out.println(k);
 				step = 0.0008;
 				interpolatedPath.add(newConf);
-				//System.out.println(newConf);
+				// System.out.println(newConf);
 				prevConf = new ASVConfig(newConf);
-				//System.out.println("Distance to goal: "+ prevConf.maxDistance(dest));
+				// System.out.println("Distance to goal: "+
+				// prevConf.maxDistance(dest));
 				m++;
 			}
 			resetScalars();
 		}
 		return interpolatedPath;
 	}
-	
-	public HashMap<Integer,Point2D> getNextStep(ASVConfig source, ASVConfig dest, int asvMid, int asvCount, double step, double angle, boolean override) {
-		HashMap<Integer,Point2D> newPosMap = new HashMap<Integer,Point2D>();
-		HashMap<Integer,Point2D> relPosMap = new HashMap<Integer,Point2D>();
-		HashMap<Integer,Point2D> destPosMap = new HashMap<Integer,Point2D>();
-		double scalar = 1;
-		//System.out.println("From: "+source.getASVPositions());
-		//System.out.println("To: " + dest.getASVPositions());
-		if(override == false) {
-			distanceMap.put(asvMid,source.getPosition(asvMid).distance(dest.getPosition(asvMid)));
-		}
-		for(int i =0; i < asvCount; i++) {
-			if(i < asvMid) {
-				Point2D relPos = new Point2D.Double(source.getPosition(i).getX() - source.getPosition(i+1).getX(),
-						source.getPosition(i).getY() -source.getPosition(i+1).getY());
-				relPosMap.put(i,relPos);
-				Point2D destPos = new Point2D.Double(dest.getPosition(i).getX() - dest.getPosition(i+1).getX(),
-						dest.getPosition(i).getY() - dest.getPosition(i+1).getY());
-				destPosMap.put(i, destPos);
-				double angleDiff = tester.normaliseAngle(Math.atan2(destPos.getY(), destPos.getX()) - Math.atan2(relPos.getY(), relPos.getX()));
-				if(override == false) {
-					distanceMap.put(i, 0.05*angleDiff*scalars.get(i));
-				}
-			} else if(i == asvMid) {
-				
-			} else if(i > asvMid) {
-				Point2D relPos = new Point2D.Double(source.getPosition(i).getX() - source.getPosition(i-1).getX(),
-						source.getPosition(i).getY() -source.getPosition(i-1).getY());
-				relPosMap.put(i,relPos);
-				Point2D destPos = new Point2D.Double(dest.getPosition(i).getX() - dest.getPosition(i-1).getX(),
-						dest.getPosition(i).getY() - dest.getPosition(i-1).getY());
-				destPosMap.put(i, destPos);
-				double angleDiff = tester.normaliseAngle(Math.atan2(destPos.getY(), destPos.getX()) - Math.atan2(relPos.getY(), relPos.getX()));
-				//if(override == false) {
-				distanceMap.put(i, 0.05*angleDiff*scalars.get(i));
-				//}
-			}
-		}
-//		double maxDist =0;
-//		int asvMax = 0;
-//		for(Integer asv : distanceMap.keySet()) {
-//			if(Math.abs(distanceMap.get(asv)) > Math.abs(maxDist)) {
-//				maxDist = distanceMap.get(asv);
-//				asvMax = asv;
-//			}
-//		}
-		List<Double> multipliers = new ArrayList<Double>();
-		
-		//System.out.println(distanceMap);
-		multipliers = setMultipliers(distanceMap,step);
-//		for(int i = 0; i < asvCount; i++) {
-//			if(i == asvMid) {
-//				multipliers.add(step*distanceMap.get(i)/Math.abs(distanceMap.get(asvMax)));
-//			} else {
-//				multipliers.add(step*20*distanceMap.get(i)/Math.abs(distanceMap.get(asvMax)));
-//			}
-//			
-//			//multipliers.add(step);
-//		}
-		//System.out.println(distanceMap);
-		//System.out.println(multipliers);
-		//if(source.getPosition(asvMid).distance(dest.getPosition(asvMid))<0.0009) {
-		//	newPosMap.put(asvMid, dest.getPosition(asvMid));
-		//} else {
-		newPosMap.put(asvMid, new Point2D.Double(source.getPosition(asvMid).getX() + multipliers.get(asvMid)*Math.cos(angle),source.getPosition(asvMid).getY() + multipliers.get(asvMid)*Math.sin(angle)));
-		//}
-		
-		//System.out.println("ASV "+asvMid+": "+newPosMap.get(asvMid));
-		//System.out.println("ASV: "+asvMid+", distance to new pos: " + newPosMap.get(asvMid).distance(dest.getPosition(asvMid)));
 
-				for(int j = asvMid-1; j > -1; j--) {
-				
-				
-				Point2D newPos;
-				newPos = new Point2D.Double(relPosMap.get(j).getX()*scalar*Math.cos(multipliers.get(j)) - relPosMap.get(j).getY()*scalar*Math.sin(multipliers.get(j)),
-						relPosMap.get(j).getX()*scalar*Math.sin(multipliers.get(j)) + relPosMap.get(j).getY()*scalar*Math.cos(multipliers.get(j)));
-						
-				newPos.setLocation(newPos.getX() + newPosMap.get(j+1).getX(), newPos.getY() + newPosMap.get(j+1).getY());
-	
-				newPosMap.put(j, newPos);
+	public HashMap<Integer, Point2D> getNextStep(ASVConfig source,
+			ASVConfig dest, int asvMid, int asvCount, double step,
+			double angle, boolean override) {
+		HashMap<Integer, Point2D> newPosMap = new HashMap<Integer, Point2D>();
+		HashMap<Integer, Point2D> relPosMap = new HashMap<Integer, Point2D>();
+		HashMap<Integer, Point2D> destPosMap = new HashMap<Integer, Point2D>();
+		double scalar = 1;
+		// System.out.println("From: "+source.getASVPositions());
+		// System.out.println("To: " + dest.getASVPositions());
+		if (override == false) {
+			distanceMap.put(
+					asvMid,
+					source.getPosition(asvMid).distance(
+							dest.getPosition(asvMid)));
+		}
+		for (int i = 0; i < asvCount; i++) {
+			if (i < asvMid) {
+				Point2D relPos = new Point2D.Double(source.getPosition(i)
+						.getX() - source.getPosition(i + 1).getX(), source
+						.getPosition(i).getY()
+						- source.getPosition(i + 1).getY());
+				relPosMap.put(i, relPos);
+				Point2D destPos = new Point2D.Double(dest.getPosition(i).getX()
+						- dest.getPosition(i + 1).getX(), dest.getPosition(i)
+						.getY() - dest.getPosition(i + 1).getY());
+				destPosMap.put(i, destPos);
+				double angleDiff = tester.normaliseAngle(Math.atan2(
+						destPos.getY(), destPos.getX())
+						- Math.atan2(relPos.getY(), relPos.getX()));
+				if (override == false) {
+					distanceMap.put(i, 0.05 * angleDiff * scalars.get(i));
+				}
+			} else if (i == asvMid) {
+
+			} else if (i > asvMid) {
+				Point2D relPos = new Point2D.Double(source.getPosition(i)
+						.getX() - source.getPosition(i - 1).getX(), source
+						.getPosition(i).getY()
+						- source.getPosition(i - 1).getY());
+				relPosMap.put(i, relPos);
+				Point2D destPos = new Point2D.Double(dest.getPosition(i).getX()
+						- dest.getPosition(i - 1).getX(), dest.getPosition(i)
+						.getY() - dest.getPosition(i - 1).getY());
+				destPosMap.put(i, destPos);
+				double angleDiff = tester.normaliseAngle(Math.atan2(
+						destPos.getY(), destPos.getX())
+						- Math.atan2(relPos.getY(), relPos.getX()));
+				// if(override == false) {
+				distanceMap.put(i, 0.05 * angleDiff * scalars.get(i));
+				// }
 			}
-			
-				//System.out.println("ASV: "+j+", distance to new pos: " + newPos.distance(dest.getPosition(j)));
-				//System.out.println("ASV "+j+": "+newPos);
-			//}
-		
-			for(int j = asvMid + 1; j < asvCount; j++) {
-				
-				Point2D newPos;
-				
-					newPos = new Point2D.Double(relPosMap.get(j).getX()*scalar*Math.cos(multipliers.get(j)) - relPosMap.get(j).getY()*scalar*Math.sin(multipliers.get(j)),
-							relPosMap.get(j).getX()*scalar*Math.sin(multipliers.get(j)) + relPosMap.get(j).getY()*scalar*Math.cos(multipliers.get(j)));
-				
-				newPos.setLocation(newPos.getX() + newPosMap.get(j-1).getX(), newPos.getY() + newPosMap.get(j-1).getY());
-				newPosMap.put(j, newPos);
-				
-			}
+		}
+		// double maxDist =0;
+		// int asvMax = 0;
+		// for(Integer asv : distanceMap.keySet()) {
+		// if(Math.abs(distanceMap.get(asv)) > Math.abs(maxDist)) {
+		// maxDist = distanceMap.get(asv);
+		// asvMax = asv;
+		// }
+		// }
+		List<Double> multipliers = new ArrayList<Double>();
+
+		// System.out.println(distanceMap);
+		multipliers = setMultipliers(distanceMap, step);
+		// for(int i = 0; i < asvCount; i++) {
+		// if(i == asvMid) {
+		// multipliers.add(step*distanceMap.get(i)/Math.abs(distanceMap.get(asvMax)));
+		// } else {
+		// multipliers.add(step*20*distanceMap.get(i)/Math.abs(distanceMap.get(asvMax)));
+		// }
+		//
+		// //multipliers.add(step);
+		// }
+		// System.out.println(distanceMap);
+		// System.out.println(multipliers);
+		// if(source.getPosition(asvMid).distance(dest.getPosition(asvMid))<0.0009)
+		// {
+		// newPosMap.put(asvMid, dest.getPosition(asvMid));
+		// } else {
+		newPosMap.put(asvMid,
+				new Point2D.Double(source.getPosition(asvMid).getX()
+						+ multipliers.get(asvMid) * Math.cos(angle), source
+						.getPosition(asvMid).getY()
+						+ multipliers.get(asvMid)
+						* Math.sin(angle)));
+		// }
+
+		// System.out.println("ASV "+asvMid+": "+newPosMap.get(asvMid));
+		// System.out.println("ASV: "+asvMid+", distance to new pos: " +
+		// newPosMap.get(asvMid).distance(dest.getPosition(asvMid)));
+
+		for (int j = asvMid - 1; j > -1; j--) {
+
+			Point2D newPos;
+			newPos = new Point2D.Double(relPosMap.get(j).getX() * scalar
+					* Math.cos(multipliers.get(j)) - relPosMap.get(j).getY()
+					* scalar * Math.sin(multipliers.get(j)), relPosMap.get(j)
+					.getX()
+					* scalar
+					* Math.sin(multipliers.get(j))
+					+ relPosMap.get(j).getY()
+					* scalar
+					* Math.cos(multipliers.get(j)));
+
+			newPos.setLocation(newPos.getX() + newPosMap.get(j + 1).getX(),
+					newPos.getY() + newPosMap.get(j + 1).getY());
+
+			newPosMap.put(j, newPos);
+		}
+
+		// System.out.println("ASV: "+j+", distance to new pos: " +
+		// newPos.distance(dest.getPosition(j)));
+		// System.out.println("ASV "+j+": "+newPos);
+		// }
+
+		for (int j = asvMid + 1; j < asvCount; j++) {
+
+			Point2D newPos;
+
+			newPos = new Point2D.Double(relPosMap.get(j).getX() * scalar
+					* Math.cos(multipliers.get(j)) - relPosMap.get(j).getY()
+					* scalar * Math.sin(multipliers.get(j)), relPosMap.get(j)
+					.getX()
+					* scalar
+					* Math.sin(multipliers.get(j))
+					+ relPosMap.get(j).getY()
+					* scalar
+					* Math.cos(multipliers.get(j)));
+
+			newPos.setLocation(newPos.getX() + newPosMap.get(j - 1).getX(),
+					newPos.getY() + newPosMap.get(j - 1).getY());
+			newPosMap.put(j, newPos);
+
+		}
 
 		return newPosMap;
 	}
-	
-	public List<Double> setMultipliers(HashMap<Integer,Double> distanceMap, double step) {
-		double maxDist =0;
+
+	public List<Double> setMultipliers(HashMap<Integer, Double> distanceMap,
+			double step) {
+		double maxDist = 0;
 		int asvMax = 0;
-		for(Integer asv : distanceMap.keySet()) {
-			if(Math.abs(distanceMap.get(asv)) > Math.abs(maxDist)) {
+		for (Integer asv : distanceMap.keySet()) {
+			if (Math.abs(distanceMap.get(asv)) > Math.abs(maxDist)) {
 				maxDist = distanceMap.get(asv);
 				asvMax = asv;
 			}
 		}
 		List<Double> multipliers = new ArrayList<Double>();
-		//System.out.println(distanceMap);
-		for(int i = 0; i < distanceMap.size(); i++) {
-			if(i == distanceMap.size()/2) {
-				multipliers.add(step*distanceMap.get(i)/Math.abs(distanceMap.get(asvMax)));
+		// System.out.println(distanceMap);
+		for (int i = 0; i < distanceMap.size(); i++) {
+			if (i == distanceMap.size() / 2) {
+				multipliers.add(step * distanceMap.get(i)
+						/ Math.abs(distanceMap.get(asvMax)));
 			} else {
-				multipliers.add(step*20*distanceMap.get(i)/Math.abs(distanceMap.get(asvMax)));
+				multipliers.add(step * 20 * distanceMap.get(i)
+						/ Math.abs(distanceMap.get(asvMax)));
 			}
-			
-			//multipliers.add(step);
+
+			// multipliers.add(step);
 		}
 		return multipliers;
 	}
-	
+
 	public void resetScalars() {
-		for(int i = 0; i < ps.getASVCount();i++) {
+		for (int i = 0; i < ps.getASVCount(); i++) {
 			scalars.put(i, 1.0);
 		}
 	}

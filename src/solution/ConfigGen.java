@@ -23,6 +23,7 @@ public class ConfigGen {
 	private static Tester tester = new Tester();
 	private List<Point2D.Double> corners;
 	public List<Rectangle2D.Double> rectInterList;
+	public List<ASVConfig> movedConfigs = new ArrayList<ASVConfig>();
 
 	public double deltaBig;
 
@@ -79,6 +80,7 @@ public class ConfigGen {
 		double[] coordsCFG; // Configuration-space coordinates of ASVs
 							// (x,y,theta1,theta2,...)
 		ASVConfig cfg;
+//		configs = new ArrayList<ASVConfig>();
 
 		// double minDistance = 0.5;
 		// for(Point2D.Double p : corners) {
@@ -95,16 +97,31 @@ public class ConfigGen {
 
 		if (configs.size() > ps.getASVCount()) {
 			for (int l = 0; l < ps.getASVCount(); l++) {
-				ASVConfig cfg1 = moveASVsAlong(
-						configs.get(configs.size() - 1 - ps.getASVCount()),
-						new Node(n2), n);
-				if (tester.hasValidBoomLengths(cfg1)
-						&& tester.hasEnoughArea(cfg1)
-						&& tester.fitsBounds(cfg1) && tester.isConvex(cfg1)
-						&& !tester.hasCollision(cfg1, this.ps.getObstacles())) {
-					configs.add(cfg1);
-					// configs2.add(cfg1);
-					// System.out.println("Moved one added.");
+				
+				if(configs.get(configs.size() - ps.getASVCount() - l).getPosition(ps.getASVCount()/2).distance(n2) < 0.015) {
+					ASVConfig cfg1 = moveASVsAlong(
+							configs.get(configs.size() - 1 - ps.getASVCount()),
+							new Node(n2), n);
+					ASVConfig cfg2 = moveASVsAlong(
+							configs.get(configs.size() - 1 - ps.getASVCount()),
+							new Node(new Point2D.Double(n.getX()-0.05,n.getY())), n);
+					if (tester.hasValidBoomLengths(cfg1)
+							&& tester.hasEnoughArea(cfg1)
+							&& tester.fitsBounds(cfg1) && tester.isConvex(cfg1)
+							&& !tester.hasCollision(cfg1, this.ps.getObstacles())) {
+						configs.add(cfg1);
+						System.out.println("Moved in direction of node");
+					}
+					if (tester.hasValidBoomLengths(cfg2)
+							&& tester.hasEnoughArea(cfg2)
+							&& tester.fitsBounds(cfg2) && tester.isConvex(cfg2)
+							&& !tester.hasCollision(cfg2, this.ps.getObstacles())) {
+						configs.add(cfg2);
+						movedConfigs.add(cfg2);
+						System.out.println("Moved horizontally");
+						// configs2.add(cfg1);
+						// System.out.println("Moved one added.");
+					}
 				}
 			}
 		}
@@ -118,7 +135,11 @@ public class ConfigGen {
 							+ ((rndGen.nextFloat() - 0.5) * 2.0) * maxDist;
 					coordsCFG[1] = n.getY()
 							+ ((rndGen.nextFloat() - 0.5) * 2.0) * maxDist;
-					coordsCFG[2] = rndGen.nextFloat() * 2 * Math.PI;
+//					if(counter.get(j) > 100000) {
+//						coordsCFG[2] = (rndGen.nextFloat() - 0.5) * 10 * Math.PI / 180;
+//					} else {
+						coordsCFG[2] = rndGen.nextFloat() * 2 * Math.PI;
+//					}
 					// Increment immediately
 					j = j + 2;
 				}
@@ -139,7 +160,7 @@ public class ConfigGen {
 						// + r.getWidth() + " " + r.getHeight() + " "
 						// + divisor);
 					} else if (r.contains(ASVPosition)
-							&& (r.getWidth() > squishDist || r.getHeight() > smallSquishDist)) {
+							&& (r.getWidth() > squishDist || r.getHeight() > squishDist)) {
 						divisor = 12;
 						//System.out.println("Width, height & divisor = "
 						//		+ r.getWidth() + " " + r.getHeight() + " "
@@ -159,12 +180,13 @@ public class ConfigGen {
 
 			counter.set(asvNo, counter.get(asvNo) + 1);
 			if (counter.get(asvNo) > 50000) {
+//				System.out.println("Stuck on ASV " + asvNo);
 				if (asvNo == ps.getASVCount() - 1) {
 					asvNo = 0;
 				} else {
 					asvNo++;
 				}
-				// System.out.println(counter);
+//				// System.out.println(counter);
 			}
 			// Test Configuration Validity
 			if (tester.hasValidBoomLengths(cfg) && tester.hasEnoughArea(cfg)
@@ -274,7 +296,7 @@ public class ConfigGen {
 
 		// cfg1.maxDistance(cfg2);
 		// cfg1.totalDistance(cfg2);
-		double delta = 0.005;
+		double delta = 0.006;
 		for (Obstacle o : ps.getObstacles()) {
 			Rectangle2D rect = o.getRect();
 			Rectangle2D.Double grownRect = new Rectangle2D.Double(rect.getX()

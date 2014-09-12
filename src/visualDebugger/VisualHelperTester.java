@@ -144,7 +144,7 @@ public class VisualHelperTester {
 			// visualHelper.waitKey();
 
 			// visualHelper.clearAll();
-
+			System.out.println(cfGen.getConfigs().size());
 			visualHelper.addRectangles(rects);
 			for (ASVConfig cfg : cfGen.getConfigs()) {
 				visualHelper.addPoints(cfg.getASVPositions());
@@ -161,20 +161,26 @@ public class VisualHelperTester {
 
 			visualHelper.repaint();
 
-			visualHelper.waitKey();
+			//visualHelper.waitKey();
 			System.out.println("Showing valid paths...");
 			visualHelper.clearAll();
 			visualHelper.addRectangles(rects);
 			List<ASVConfig> validConfigs2 = a.interpolateSolution(validConfigs);
 			// List<ASVConfig> validConfigs = new ArrayList<ASVConfig>();
+//			cfGen.generateConfigs(new Node(0.5,0.488), 7, 1, new Point2D.Double(0.495,0.488));
+//			System.out.println(cfGen.getConfigs().size());
 			for (ASVConfig cfg : validConfigs2) {
 				visualHelper.addPoints(cfg.getASVPositions());
 				visualHelper.addLinkedPoints(cfg.getASVPositions());
 			}
 			visualHelper.repaint();
+			//visualHelper.waitKey();
 			a.ps.setPath(validConfigs2);
 			System.out.println(validConfigs2.size());
 			System.out.println(tester.getInvalidAreaStates());
+			for(Integer x : tester.getInvalidAreaStates()) {
+				System.out.println(tester.hasArea(validConfigs2.get(x)));
+			}
 			System.out.println(tester.getInvalidBoomStates());
 			System.out.println(tester.getCollidingStates());
 			System.out.println(tester.getInvalidSteps());

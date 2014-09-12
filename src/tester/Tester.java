@@ -429,6 +429,20 @@ public class Tester {
 		double area = Math.abs(total) / 2;
 		return (area >= getMinimumArea(cfg.getASVCount()) - maxError);
 	}
+	
+	public Double hasArea(ASVConfig cfg) {
+		double total = 0;
+		List<Point2D.Double> points = cfg.getASVPositions();
+		points.add(points.get(0));
+		points.add(points.get(1));
+		for (int i = 1; i < points.size() - 1; i++) {
+			total += points.get(i).getX()
+					* (points.get(i + 1).getY() - points.get(i - 1).getY());
+		}
+		double area = Math.abs(total) / 2;
+		System.out.println("Required area: " + getMinimumArea(cfg.getASVCount()));
+		return area;
+	}
 
 	/**
 	 * Checks that each configuration fits within the workspace bounds.

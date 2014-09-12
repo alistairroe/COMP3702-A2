@@ -225,4 +225,12 @@ public class ASVConfig {
 	public List<Point2D.Double> getASVPositions() {
 		return new ArrayList<Point2D.Double>(asvPositions);
 	}
+	
+	public ASVConfig shiftASVs(Point2D point) {
+		List<Point2D.Double> pointList = new ArrayList<Point2D.Double>();
+		for(Point2D p : asvPositions) {
+			pointList.add(new Point2D.Double(p.getX() + point.getX(), p.getY()+point.getY()));
+		}
+		return new ASVConfig(pointList);
+	}
 }
