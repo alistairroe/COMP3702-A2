@@ -52,7 +52,7 @@ public class Tester {
 	}
 
 	/** Remembers the specifications of the problem. */
-	private ProblemSpec ps = new ProblemSpec();
+	private ProblemSpec ps;
 	/** The maximum error allowed by this Tester */
 	private double maxError;
 	/** The workspace bounds, with allowable error. */
@@ -63,6 +63,11 @@ public class Tester {
 	 */
 	public Tester() {
 		this(DEFAULT_MAX_ERROR);
+		ps = new ProblemSpec();
+	}
+	public Tester(ProblemSpec ps) {
+		this(DEFAULT_MAX_ERROR);
+		this.ps = ps;
 	}
 
 	/**

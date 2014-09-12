@@ -15,6 +15,7 @@ import solution.AStarCfg;
 import solution.Alistair;
 import solution.ConfigGen;
 import solution.Node;
+import tester.Tester;
 
 //import solution.ConfigGenOld;
 
@@ -31,7 +32,8 @@ public class VisualHelperTester {
 				.get(a.ps.getASVCount() / 2));
 		Node n2 = new Node(a.ps.getGoalState().getASVPositions()
 				.get(a.ps.getASVCount() / 2));
-
+		
+		Tester tester = new Tester(a.ps);
 		List<Node> path = new ArrayList<Node>();
 		List<List<Point2D.Double>> edges = new ArrayList<List<Point2D.Double>>();
 		int trial = 0;
@@ -77,7 +79,7 @@ public class VisualHelperTester {
 
 			int i = 1;
 			int nASV = a.ps.getASVCount();
-			int nSample = 10;
+			int nSample = 6;
 			double maxLinkDist = 0.05;
 
 			ConfigGen cfGen = new ConfigGen(nSample, a.findPathCorners(path),
@@ -171,6 +173,12 @@ public class VisualHelperTester {
 			}
 			visualHelper.repaint();
 			a.ps.setPath(validConfigs2);
+			System.out.println(validConfigs2.size());
+			System.out.println(tester.getInvalidAreaStates());
+			System.out.println(tester.getInvalidBoomStates());
+			System.out.println(tester.getCollidingStates());
+			System.out.println(tester.getInvalidSteps());
+			System.out.println(tester.getNonConvexStates());
 			try {
 				a.ps.saveSolution("src/testcases/test_out.txt");
 			} catch (IOException e) {
@@ -181,6 +189,7 @@ public class VisualHelperTester {
 		final long endTime = System.currentTimeMillis();
 		System.out.println("Total execution time: " + (endTime - startTime)
 				/ 1000.0);
+		
 
 		visualHelper.repaint();
 

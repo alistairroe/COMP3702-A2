@@ -141,13 +141,14 @@ public class ConfigGen {
 					} else if (r.contains(ASVPosition)
 							&& (r.getWidth() > squishDist || r.getHeight() > smallSquishDist)) {
 						divisor = 12;
-						System.out.println("Width, height & divisor = "
-								+ r.getWidth() + " " + r.getHeight() + " "
-								+ divisor);
+						//System.out.println("Width, height & divisor = "
+						//		+ r.getWidth() + " " + r.getHeight() + " "
+						//		+ divisor);
 					} else {
 						divisor = 3;
 					}
 				}
+				
 				coordsCFG[j + 1] = tester.normaliseAngle(coordsCFG[j]
 						+ convexity * randVal * 2 * Math.PI / divisor);
 				j++;
@@ -200,13 +201,15 @@ public class ConfigGen {
 		ArrayList<ASVConfig> invalidConfigs = new ArrayList<ASVConfig>();
 		int i = 0, j = 0;
 		for (ASVConfig cfg : configs) {
-			configMap.put(cfg, new HashMap<ASVConfig, Double>());
-			for (ASVConfig otherCfg : configs) {
+			if(configMap.get(cfg) == null) {
+				configMap.put(cfg, new HashMap<ASVConfig, Double>());
+			}
+			for (ASVConfig otherCfg : configs.subList(i, configs.size())) {
 				if (!cfg.equals(otherCfg)
 						&& cfg.maxDistance(otherCfg) < maxDistance
-						&& validEdge(cfg, otherCfg)) {
+						&& validEdge2(cfg, otherCfg)) {
 					configMap.get(cfg).put(otherCfg, cfg.maxDistance(otherCfg));
-					if (!configMap.keySet().contains(otherCfg)) {
+					if (configMap.get(otherCfg) == null) {
 						configMap.put(otherCfg,
 								new HashMap<ASVConfig, Double>());
 					}
@@ -253,6 +256,33 @@ public class ConfigGen {
 			for (int i = 0; i < cfg1.getASVCount(); i++) {
 				if (new Line2D.Double(cfg1.getPosition(i), cfg2.getPosition(i))
 						.intersects(o.getRect())) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+	
+	private boolean validEdge2(ASVConfig cfg1, ASVConfig cfg2) {
+		// Create line from configurations
+		// Check if halfway point of line is <= half line length to closest
+		// obstacle corner
+		// if not, valid
+		// if so, split line and recheck
+		// Implement recursively
+
+		// cfg1.maxDistance(cfg2);
+		// cfg1.totalDistance(cfg2);
+		double delta = 0.005;
+		for (Obstacle o : ps.getObstacles()) {
+			Rectangle2D rect = o.getRect();
+			Rectangle2D.Double grownRect = new Rectangle2D.Double(rect.getX()
+					- delta, rect.getY() - delta, rect.getWidth()
+					+ delta * 2, rect.getHeight() + delta * 2);
+			for (int i = 0; i < cfg1.getASVCount(); i++) {
+				if (new Line2D.Double(cfg1.getPosition(i), cfg2.getPosition(i))
+						.intersects(grownRect)) {
 					return false;
 				}
 			}
