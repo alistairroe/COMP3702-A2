@@ -1,5 +1,6 @@
 package problem;
 
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -84,6 +85,12 @@ public class ProblemSpec {
 				lineNo++;
 				obstacles.add(new Obstacle(line));
 			}
+			obstacles.add(new Obstacle(  0.0,  -0.01,   1.0,  0.01));
+			obstacles.add(new Obstacle(  1.0,    0.0,  0.01,   1.0));
+			obstacles.add(new Obstacle(  0.0,    1.0,   1.0,  0.01));
+			obstacles.add(new Obstacle(-0.01,    0.0,   0.01,  1.0));
+	
+
 
 			problemLoaded = true;
 		} catch (InputMismatchException e) {

@@ -108,17 +108,17 @@ public class ConfigGen {
 					if (tester.hasValidBoomLengths(cfg1)
 							&& tester.hasEnoughArea(cfg1)
 							&& tester.fitsBounds(cfg1) && tester.isConvex(cfg1)
-							&& !tester.hasCollision(cfg1, this.ps.getObstacles())) {
+							&& !tester.hasCollision2(cfg1, this.ps.getObstacles())) {
 						configs.add(cfg1);
-						System.out.println("Moved in direction of node");
+						//System.out.println("Moved in direction of node");
 					}
 					if (tester.hasValidBoomLengths(cfg2)
 							&& tester.hasEnoughArea(cfg2)
 							&& tester.fitsBounds(cfg2) && tester.isConvex(cfg2)
-							&& !tester.hasCollision(cfg2, this.ps.getObstacles())) {
+							&& !tester.hasCollision2(cfg2, this.ps.getObstacles())) {
 						configs.add(cfg2);
 						movedConfigs.add(cfg2);
-						System.out.println("Moved horizontally");
+						//System.out.println("Moved horizontally");
 						// configs2.add(cfg1);
 						// System.out.println("Moved one added.");
 					}
@@ -191,7 +191,7 @@ public class ConfigGen {
 			// Test Configuration Validity
 			if (tester.hasValidBoomLengths(cfg) && tester.hasEnoughArea(cfg)
 					&& tester.fitsBounds(cfg) && tester.isConvex(cfg)
-					&& !tester.hasCollision(cfg, this.ps.getObstacles())) {
+					&& !tester.hasCollision2(cfg, this.ps.getObstacles())) {
 				configs.add(cfg); // Add if valid
 				// System.out.println("ADDED CONFIG: " + (i + 1) + "/"
 				// + numSamples);

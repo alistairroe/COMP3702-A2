@@ -105,6 +105,7 @@ public class AStarCfg {
 		}
 		System.out.print("No Solution Found!");
 		// return new ArrayList<ASVConfig>();
+		closedSet.add(startCfg);
 		return closedSet;
 
 	}

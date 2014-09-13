@@ -174,13 +174,16 @@ public class VisualHelper extends JPanel implements KeyListener {
 		g.fillRect(0, 0, panelWidth, panelHeight);
 
 		// Draw points
-		for (Point2D p : points) {
-			int x1 = (int) (p.getX() * panelWidth);
-			int y1 = (int) (p.getY() * panelHeight);
-			g.setColor(Color.black);
-			g.drawRect(x1-2, panelHeight - y1-2, 4, 4);
+		try{
+			for (Point2D p : points) {
+				int x1 = (int) (p.getX() * panelWidth);
+				int y1 = (int) (p.getY() * panelHeight);
+				g.setColor(Color.black);
+				g.drawRect(x1-2, panelHeight - y1-2, 4, 4);
+			}
+		} catch(NullPointerException e){
+			
 		}
-
 		// Draw rectangles
 		for (Rectangle2D r : rectangles) {
 			int x = (int) (r.getX() * panelWidth);

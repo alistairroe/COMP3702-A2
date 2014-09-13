@@ -32,9 +32,8 @@ public class Alistair {
 		tester = new Tester();
 
 		try {
-			ps.loadProblem("src/testcases/7ASV.txt");
+			ps.loadProblem("src/testcases/E/11ASV-c1.txt");
 		} catch (IOException e) {
-
 		}
 	}
 
@@ -57,7 +56,7 @@ public class Alistair {
 					generator.nextDouble());
 			valid = true;
 			for (Obstacle o : ps.getObstacles()) {
-				double delta = 0.003;
+				double delta = 0.008;
 				Rectangle2D rect = o.getRect();
 				Rectangle2D.Double grownRect = new Rectangle2D.Double(
 						rect.getX() - delta, rect.getY() - delta,
@@ -269,15 +268,15 @@ public class Alistair {
 			if (r.getWidth() < r.getHeight()) {
 				r.x = r.x - (deltaBig - r.getWidth());
 				// r.y = r.y + deltaBig;
-				r.y = r.y + r.width / 4;
+				r.y = r.y + deltaBig;
 				r.height = r.height - deltaBig * 2;
-				r.width = r.width + (deltaBig * 2 - r.width);
+				r.width = (deltaBig * 2 - r.width);
 			} else {
 				// r.x = r.x + deltaBig;
-				r.x = r.x + r.height / 4;
+				r.x = r.x + deltaBig;
 				r.y = r.y - (deltaBig - r.getHeight());
 				r.width = r.width - deltaBig * 2;
-				r.height = r.height + (deltaBig * 2 - r.height);
+				r.height = (deltaBig * 2 - r.height);
 			}
 		}
 		// System.out.println(rectInterList);
@@ -317,19 +316,28 @@ public class Alistair {
 		int asvCount = path.get(0).getASVCount();
 		int asvMid = asvCount / 2;
 		boolean override = false;
-		ASVConfig source = path.get(0);
-		ASVConfig dest = path.get(1);
-		ASVConfig prevConf = new ASVConfig(source);
+		ASVConfig source;
+		ASVConfig dest;
+		ASVConfig prevConf;
+		try {
+			source = path.get(0);
+			dest = path.get(1);
+			//path.add(path.get(path.size()-1));
+			prevConf = new ASVConfig(source);
+		} catch (Exception e) {
+			return interpolatedPath;
+		}
 		ASVConfig newConf;
 		for (int i = 1; i < path.size(); i++) {
 			System.out.println("Node: " + i);
-			System.out.println("Length of interpolated path: "
-					+ interpolatedPath.size());
-			System.out.println("Distance between prevConf and source: "
-					+ prevConf.maxDistance(path.get(i - 1)));
+			System.out.println("Length of path: "
+					+ path.size());
+			
+			//		+ prevConf.maxDistance(path.get(i - 1)));
 			// interpolatedPath.add(path.get(i-1));
 			// ASVConfig source = path.get(i - 1);
 			dest = path.get(i);
+			
 			// double dist =
 			// dest.getPosition(asvMid).distance(source.getPosition(asvMid));
 			double angle = Math.atan2(
@@ -415,9 +423,10 @@ public class Alistair {
 												scalars.put(q, 0.2);
 											} else if (z == 2) {
 												scalars.put(q, 5.0);
-											} else
+											} else {
 												scalars.put(q, 0.05);
 										}
+									
 
 									} else {
 										// distanceMap.put(q,distanceMap.get(q)*5);
@@ -431,8 +440,9 @@ public class Alistair {
 											scalars.put(q, 10.0);
 									}
 									// return interpolatedPath;
-									if (z == 10) {
+									if ((z == 10)) {
 										resetScalars();
+										//movingback = true;
 										double angle2 = Math.atan2(prevConf
 												.getPosition(asvMid).getY()
 												- o.getRect().getCenterY(),
@@ -444,8 +454,9 @@ public class Alistair {
 										// Point2D.Double(0.05*Math.cos(angle2),0.05*Math.sin(angle2))));
 										dest = prevConf
 												.shiftASVs(new Point2D.Double(
-														0.05 * Math.cos(angle2),
-														0.05 * Math.sin(angle2)));
+														0.01 * Math.cos(angle2),
+														0.01 * Math.sin(angle2)));
+										//path.add(i,dest);
 										angle = Math.atan2(
 												dest.getPosition(asvMid).getY()
 														- prevConf.getPosition(
@@ -453,11 +464,12 @@ public class Alistair {
 												dest.getPosition(asvMid).getX()
 														- prevConf.getPosition(
 																asvMid).getX());
-										System.out.println("Movin out");
-										System.out.println("Top z = " + z);
-										System.out.println("q = " + q);
+										//System.out.println("Movin out");
+										//System.out.println("Top z = " + z);
+										//System.out.println("q = " + q);
 									}
 
+								}
 								}
 							} else if (q == asvMid) {
 
@@ -541,12 +553,14 @@ public class Alistair {
 											// path.add(i,
 											// prevConf.shiftASVs(new
 											// Point2D.Double(0.05*Math.cos(angle2),0.05*Math.sin(angle2))));
+											
 											dest = prevConf
 													.shiftASVs(new Point2D.Double(
-															0.05 * Math
+															0.01 * Math
 																	.cos(angle2),
-															0.05 * Math
+															0.01 * Math
 																	.sin(angle2)));
+											//path.add(i,dest);
 											angle = Math
 													.atan2(dest.getPosition(
 															asvMid).getY()
@@ -561,9 +575,9 @@ public class Alistair {
 																			.getPosition(
 																					asvMid)
 																			.getX());
-											System.out.println("Movin out");
-											System.out.println("z = " + z);
-											System.out.println("q = " + q);
+											//System.out.println("Movin out");
+											//System.out.println("z = " + z);
+											//System.out.println("q = " + q);
 										}
 
 									}
@@ -576,11 +590,11 @@ public class Alistair {
 									.getX(), newPosMap.get(j).getY()));
 						}
 
-						if ((!tester.isConvex(new ASVConfig(tempList)))
+						if ((!tester.isConvex(new ASVConfig(tempList)) || !tester.hasEnoughArea(new ASVConfig(tempList)))
 								&& z == 1) {
 							valid = false;
 							scalars.put(0, 5.0);
-						} else if (!tester.isConvex(new ASVConfig(tempList))) {
+						} else if (!tester.isConvex(new ASVConfig(tempList)) || !tester.hasEnoughArea(new ASVConfig(tempList))) {
 							valid = false;
 							scalars.put(asvCount - 1, 5.0);
 						}
@@ -618,9 +632,15 @@ public class Alistair {
 				// System.out.println("Distance to goal: "+
 				// prevConf.maxDistance(dest));
 				m++;
+//				if((prevConf.maxDistance(path.get(i)) < 0.0008) && (i == path.size()-1)) {
+//					interpolatedPath.add(path.get(i));
+//					System.out.println("Added");
+//					return interpolatedPath;
+//				}
 			}
 			resetScalars();
 		}
+		interpolatedPath.add(path.get(path.size()-1));
 		return interpolatedPath;
 	}
 

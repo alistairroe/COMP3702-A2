@@ -586,7 +586,7 @@ public class Tester {
 		
 	}
 	public boolean hasCollision2(ASVConfig cfg, Obstacle o) {
-		Rectangle2D lenientRect = grow(o.getRect(), 0.01);
+		Rectangle2D lenientRect = grow(o.getRect(), 0.006);
 		List<Point2D.Double> points = cfg.getASVPositions();
 		for (int i = 1; i < points.size(); i++) {
 			if (new Line2D.Double(points.get(i - 1), points.get(i))
